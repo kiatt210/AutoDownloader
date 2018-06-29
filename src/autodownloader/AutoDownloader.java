@@ -17,6 +17,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
+
+import hu.kiss.seeder.run.Runner;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -45,6 +49,7 @@ public class AutoDownloader {
     private static String phpSessioId = "";
     private static HttpClient client;
     private static List<Torrent> hrTorrents = new ArrayList<Torrent>();
+    private static Log logger = LogFactory.getLog(AutoDownloader.class);
 
     /**
      * @param args the command line arguments
@@ -67,14 +72,14 @@ public class AutoDownloader {
 
         HttpResponse response = client.execute(loginP);
 
-        System.out.println("Status code: " + response.getStatusLine().getStatusCode());
+        logger.debug("Status code: " + response.getStatusLine().getStatusCode());
 
         setPhpSession(response);
 
-        System.out.println("Start get");
+        logger.debug("Start get");
         response = doGet(HR_URL);
         String content = getContent(response);
-        System.out.println("Content: \n" + content);
+        logger.debug("Content: \n" + content);
         
         Document hrDoc = getDocument(content);
         findTorrents(hrDoc);
@@ -82,16 +87,16 @@ public class AutoDownloader {
     }
 
     private static HttpResponse doGet(String url) throws IOException {
-        System.out.println("Start get url=" + url);
+        logger.debug("Start get url=" + url);
         HttpGet get = new HttpGet(url);
         get.setHeader("Cookie", "PHPSESSID=" + phpSessioId + "; nyelv=hu; stilus=default");
 
-        System.out.println("Header setted");
+        logger.debug("Header setted");
 
         HttpResponse response = client.execute(get);
         printHeaders(response);
 
-        System.out.println("Request executed");
+        logger.debug("Request executed");
 
         return response;
     }
@@ -100,7 +105,7 @@ public class AutoDownloader {
         //get all headers
         Header[] headers = response.getAllHeaders();
         for (Header header : headers) {
-            System.out.println("Key: " + header.getName() + " = Value:" + header.getValue());
+            logger.debug("Key: " + header.getName() + " = Value:" + header.getValue());
         }
     }
 
@@ -110,17 +115,17 @@ public class AutoDownloader {
         for (Header header : headers) {
             if (header.getName().equals("Set-Cookie") && header.getValue().startsWith("PHPSESSID=")) {
                 phpSessioId = header.getValue().split("PHPSESSID=")[1].replace("; path=/", "");
-                System.out.println("PHPSESSID=" + phpSessioId);
+                logger.debug("PHPSESSID=" + phpSessioId);
             }
         }
     }
 
     private static String getContent(HttpResponse response) throws IOException {
-        System.out.println("Get content");
+        logger.debug("Get content");
         BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
         StringBuilder responseStr = new StringBuilder();
         String line;
-        System.out.println("Start read");
+        logger.debug("Start read");
         while ((line = rd.readLine()) != null) {
             responseStr.append(line);
             responseStr.append('\r');
@@ -135,7 +140,7 @@ public class AutoDownloader {
         int i = 1;
         while (m.find()) {
             String comment = m.group(0);
-            System.out.println("#" + i + "Comment:" + comment);
+            logger.debug("#" + i + "Comment:" + comment);
             content = content.replace(comment, "");
             i++;
 
@@ -147,7 +152,7 @@ public class AutoDownloader {
     }
 
     private static Document getDocument(String content) throws ParserConfigurationException, SAXException, IOException {
-        System.out.println("Get document");
+        logger.debug("Get document");
 
         Document doc = Jsoup.parse(content);
 
@@ -155,16 +160,16 @@ public class AutoDownloader {
     }
 
     private static void findTorrents(Document hrDocument) throws XPathExpressionException {
-        System.out.println("Find torrents");
+        logger.debug("Find torrents");
         Elements torrentsE = hrDocument.select("div[class^=hnr_all]");
-        System.out.println("Torrents size: "+torrentsE.size());;
+        logger.debug("Torrents size: "+torrentsE.size());;
         for(int i=0; i<torrentsE.size(); i++){
             Torrent t = new Torrent(torrentsE.get(i));
             hrTorrents.add(t);
         }
         
         Collections.sort(hrTorrents);
-        System.out.println(hrTorrents);
+        logger.debug(hrTorrents);
         
     }
 

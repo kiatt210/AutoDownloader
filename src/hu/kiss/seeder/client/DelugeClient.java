@@ -5,6 +5,7 @@
  */
 package hu.kiss.seeder.client;
 
+import hu.kiss.seeder.client.utils.HTTPUtils;
 import hu.kiss.seeder.data.DelugeTorrent;
 import hu.kiss.seeder.data.Status;
 import hu.kiss.seeder.data.Torrent;
@@ -20,6 +21,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -29,6 +33,8 @@ import org.json.simple.parser.ParseException;
  * @author KICSI
  */
 public class DelugeClient {
+
+    private static Log logger = LogFactory.getLog(DelugeClient.class);
 
     private static final String TARTOS_LABEL = "tartos";
     private List<DelugeTorrent> dTorrents = new ArrayList<DelugeTorrent>();
@@ -96,9 +102,9 @@ public class DelugeClient {
                 }
             });
 
-            System.out.println("Tartos ids: ");
+            logger.debug("Tartos ids: ");
             tartosIds.stream().forEach(id -> {
-                System.out.println(id);
+                logger.debug(id);
             });
 
         } catch (FileNotFoundException ex) {
@@ -111,26 +117,26 @@ public class DelugeClient {
     }
 
     public void addTorrent(String torrentFile) {
-        System.out.println("Start add " + torrentFile);
+        logger.debug("Start add " + torrentFile);
         String addCommand = "deluge-console add " + torrentFile;
         String output = executeCommand(addCommand);
-        System.out.println("Result: " + output);
+        logger.debug("Result: " + output);
         runningSize++;
     }
 
     public void removeTorrent(String id) {
-        System.out.println("Start remove " + id);
+        logger.debug("Start remove " + id);
         String rmCommand = "deluge-console rm " + id + " --remove_data";
         String output = executeCommand(rmCommand);
-        System.out.println("Result: " + output);
+        logger.debug("Result: " + output);
         runningSize--;
     }
 
     public void pauseTorrent(String id) {
-        System.out.println("Start pause " + id);
+        logger.debug("Start pause " + id);
         String pauseCommand = "deluge-console pause " + id;
         String output = executeCommand(pauseCommand);
-        System.out.println("Result: " + output);
+        logger.debug("Result: " + output);
         runningSize--;
     }
 
@@ -140,7 +146,7 @@ public class DelugeClient {
 
         Process p;
         try {
-            System.out.println("Execute: " + command);
+            logger.debug("Execute: " + command);
             p = Runtime.getRuntime().exec(command);
             p.waitFor();
             BufferedReader reader
@@ -150,7 +156,7 @@ public class DelugeClient {
             while ((line = reader.readLine()) != null) {
                 output.append(line + "\n");
             }
-            System.out.println("Response: " + output);
+            logger.debug("Response: " + output);
 
         } catch (Exception e) {
             e.printStackTrace();

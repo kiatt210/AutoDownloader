@@ -24,13 +24,11 @@ public enum Status {
     }
     
     public static Status findByStr(String str){
-        System.out.println("Search status: "+str);
         for(Status s : Status.values()){
             if(s.delugeString.equals(str)){
                 return s;
             }
         }
-        System.out.println("System not found for: "+str);
         return null;
         
     }

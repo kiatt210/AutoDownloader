@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -27,6 +30,8 @@ import org.apache.http.message.BasicNameValuePair;
  * @author KICSI
  */
 public class HTTPUtils {
+
+    private static Log logger = LogFactory.getLog(HTTPUtils.class);
     
     HttpClient client;
     public HTTPUtils (){
@@ -45,7 +50,7 @@ public class HTTPUtils {
             HttpResponse response = client.execute(post);
             return response;
         } catch (IOException ex) {
-            System.out.println("Error in sending post to "+url+"\n"+ex.getMessage());
+            logger.debug("Error in sending post to "+url+"\n"+ex.getMessage());
         } 
         return null;
     }
@@ -80,7 +85,7 @@ public class HTTPUtils {
     
     public HttpResponse doGet(String url, Map<String,String> headers) {
         try {
-            System.out.println("Start get url=" + url);
+            logger.debug("Start get url=" + url);
             HttpGet get = new HttpGet(url);
             if(headers != null){
                 headers.entrySet().forEach( head -> {
@@ -91,11 +96,11 @@ public class HTTPUtils {
             HttpResponse response = client.execute(get);
 //            printHeaders(response);
             
-            System.out.println("Request executed");
+            logger.debug("Request executed");
             
             return response;
         } catch (IOException ex) {
-            System.out.println("Error while sending get to "+url+"\n"+ex.getMessage());
+            logger.debug("Error while sending get to "+url+"\n"+ex.getMessage());
         }
         return null;
     }
@@ -104,7 +109,7 @@ public class HTTPUtils {
         //get all headers
         Header[] headers = response.getAllHeaders();
         for (Header header : headers) {
-            System.out.println("Key: " + header.getName() + " = Value:" + header.getValue());
+            logger.debug("Key: " + header.getName() + " = Value:" + header.getValue());
         }
     }
     

@@ -18,6 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -30,6 +33,7 @@ import org.jsoup.nodes.Document;
  */
 public class NCoreClient {
 
+    private static Log logger = LogFactory.getLog(NCoreClient.class);
     private static final String LOGIN_URL = "https://ncore.cc/login.php";
     private static final String HOME_URL = "https://ncore.cc/index.php";
     private static final String HR_URL = "https://ncore.cc/hitnrun.php";
@@ -54,7 +58,7 @@ public class NCoreClient {
         try {
             doLogin(password);
         } catch (IOException ex) {
-            System.out.println("Error while logging:" + ex.getMessage());
+            logger.debug("Error while logging:" + ex.getMessage());
         }
     }
 
@@ -68,7 +72,7 @@ public class NCoreClient {
 
         HttpResponse response = httpUtils.doPost(LOGIN_URL, params);
 
-        System.out.println("Status code: " + response.getStatusLine().getStatusCode());
+        logger.debug("Status code: " + response.getStatusLine().getStatusCode());
 
         setPhpSession(response);
 
@@ -77,8 +81,8 @@ public class NCoreClient {
         String responseStr = httpUtils.getContent(response);
         Document doc = Jsoup.parse(responseStr);
         logoutUrl = doc.select("a#menu_11").attr("href");
-        System.out.println("Logout url:" + logoutUrl);
-        System.out.println(userName+" has logged in");
+        logger.debug("Logout url:" + logoutUrl);
+        logger.debug(userName+" has logged in");
     }
 
     private void setPhpSession(HttpResponse response) {
@@ -87,13 +91,13 @@ public class NCoreClient {
         for (Header header : headers) {
             if (header.getName().equals("Set-Cookie") && header.getValue().startsWith("PHPSESSID=")) {
                 phpSessionId = header.getValue().split("PHPSESSID=")[1].replace("; path=/", "");
-                System.out.println("PHPSESSID=" + phpSessionId);
+                logger.debug("PHPSESSID=" + phpSessionId);
             }
         }
     }
 
     public void logout() {
-        System.out.println(userName+" has logged out");
+        logger.info(userName+" has logged out");
         httpUtils.doGet(BASE_URL + logoutUrl, getDefaultHeader());
     }
 
@@ -104,7 +108,7 @@ public class NCoreClient {
     }
 
     public void populateHrTorrents() {
-        System.out.println("Populate hit&run torrents");
+        logger.debug("Populate hit&run torrents");
         HttpResponse response = httpUtils.doGet(HR_URL, getDefaultHeader());
 
         String content = httpUtils.getContent(response);

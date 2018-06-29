@@ -5,18 +5,24 @@
  */
 package hu.kiss.seeder.data;
 
+import hu.kiss.seeder.client.NCoreClient;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  *
  * @author KICSI
  */
 public class DelugeTorrent {
 
+    private static Log logger = LogFactory.getLog(DelugeTorrent.class);
+
     private String nev;
     private String id;
     private Status status;
 
     public DelugeTorrent(String info) {
-        System.out.println("Cretae new Deluge Torrent from: " + info);
+        logger.debug("Cretae new Deluge Torrent from: " + info);
         String[] lines = info.split("\n");
         for (String line : lines) {
             if (line.startsWith("Name: ")) {
@@ -28,9 +34,9 @@ public class DelugeTorrent {
 
             }
         }
-//        System.out.println("Nev: " + nev);
-//        System.out.println("Id: " + id);
-//        System.out.println("staus: " + status);
+//        logger.debug("Nev: " + nev);
+//        logger.debug("Id: " + id);
+//        logger.debug("staus: " + status);
     }
 
     public DelugeTorrent() {
@@ -56,7 +62,7 @@ public class DelugeTorrent {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof DelugeTorrent) {
-            //System.out.println(this.nev+" =? "+((DelugeTorrent) obj).getNev());
+            //logger.debug(this.nev+" =? "+((DelugeTorrent) obj).getNev());
             return this.nev.equals(((DelugeTorrent) obj).getNev());
         } else {
             return super.equals(obj);
