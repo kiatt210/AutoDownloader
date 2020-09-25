@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Class-Path: lib/javaee-api-7.0.jar lib/javaee-web-api-7.0.jar lib/http
- client-4.5.5.jar lib/httpcore-4.4.9.jar lib/commons-logging-1.2.jar l
- ib/jsoup-1.11.2.jar lib/json-simple-1.1.1.jar
-Main-Class: hu.kiss.seeder.run.Runner
-
