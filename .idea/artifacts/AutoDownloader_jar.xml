@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="AutoDownloader:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/AutoDownloader_jar</output-path>
-    <root id="archive" name="AutoDownloader.jar">
-      <element id="module-output" name="AutoDownloader" />
-    </root>
-  </artifact>
-</component>
