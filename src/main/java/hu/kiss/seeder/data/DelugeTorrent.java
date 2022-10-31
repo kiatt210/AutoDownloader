@@ -5,6 +5,8 @@
  */
 package hu.kiss.seeder.data;
 
+import java.time.LocalDateTime;
+
 /**
  *
  * @author KICSI
@@ -14,6 +16,8 @@ public class DelugeTorrent {
     private String nev;
     private String id;
     private Status status;
+    private String category;
+    private LocalDateTime additionDate;
 
     public DelugeTorrent(String info) {
         System.out.println("Cretae new Deluge Torrent from: " + info);
@@ -34,7 +38,7 @@ public class DelugeTorrent {
     }
 
     public DelugeTorrent() {
-        
+
     }
 
     public String getNev() {
@@ -51,6 +55,30 @@ public class DelugeTorrent {
 
     public void setNev(String nev) {
         this.nev = nev;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getAdditionDate() {
+        return additionDate;
+    }
+
+    public void setAdditionDate(LocalDateTime additionDate) {
+        this.additionDate = additionDate;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     @Override

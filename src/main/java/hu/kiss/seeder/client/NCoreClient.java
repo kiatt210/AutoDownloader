@@ -5,57 +5,62 @@
  */
 package hu.kiss.seeder.client;
 
+import hu.kiss.seeder.auth.Secret;
 import hu.kiss.seeder.client.utils.HTMLUtils;
 import hu.kiss.seeder.client.utils.HTTPUtils;
 import hu.kiss.seeder.data.Torrent;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import jBittorrentAPI.BDecoder;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  *
  * @author KICSI
  */
 public class NCoreClient {
-    
-    private static final String LOGIN_URL = "https://ncore.cc/login.php";
-    private static final String HOME_URL = "https://ncore.cc/index.php";
-    private static final String HR_URL = "https://ncore.cc/hitnrun.php";
-    private static final String BASE_URL = "https://ncore.cc/";
-    public static final String DOWNLOAD_LOCATION = "/home/seeder/torrents/";
+
+    private static final String LOGIN_URL = "https://ncore.pro/login.php";
+    private static final String HOME_URL = "https://ncore.pro/index.php";
+    private static final String HR_URL = "https://ncore.pro/hitnrun.php";
+    private static final String BASE_URL = "https://ncore.pro/";
+    public static /*final*/ String DOWNLOAD_LOCATION = "/home/seeder/torrents/";
     private String downloadLink = "torrents.php?action=download&id=${id}&key=${passkey}";
+
+    private static Logger logger = LogManager.getLogger();
 
     private HttpClient client;
     private HTTPUtils httpUtils;
     private String phpSessionId;
     private String logoutUrl;
     private String userName;
-    
+
     private int running = 0;
 
     private List<Torrent> hrTorrents = new ArrayList<Torrent>();
 
-    public void login(String userName, String password, String passKey) {
-        this.userName = userName;
-        this.downloadLink = downloadLink.replace("${passkey}", passKey);
+    public void login(Secret secret) {
+        this.userName = secret.getUsername();
+        this.downloadLink = downloadLink.replace("${passkey}", secret.getKey());
         this.httpUtils = new HTTPUtils();
         try {
-            doLogin(password);
+            doLogin(secret.getPassword());
         } catch (IOException ex) {
-            System.out.println("Error while logging:" + ex.getMessage());
+            logger.error("Error while logging:" + ex.getMessage());
         }
     }
 
@@ -68,19 +73,12 @@ public class NCoreClient {
         params.put("submitted", "1");
 
         HttpResponse response = httpUtils.doPost(LOGIN_URL, params);
-
-        System.out.println("Status code: " + response.getStatusLine().getStatusCode());
+        logger.debug(httpUtils.getContent(response));
+        logger.debug("Status code: " + response.getStatusLine().getStatusCode());
 
         setPhpSession(response);
 
-        //Elmentjük a kijelentkezés linkjét, mert ez sessiononként egyedi     
-        response = httpUtils.doGet(HOME_URL, getDefaultHeader());
-        String responseStr = httpUtils.getContent(response);
-
-        Document doc = Jsoup.parse(responseStr);
-        logoutUrl = doc.select("a#menu_11").attr("href");
-        System.out.println("Logout url:" + logoutUrl);
-        System.out.println(userName+" has logged in");
+        logger.info(userName+" has logged in");
     }
 
     private void setPhpSession(HttpResponse response) {
@@ -89,13 +87,13 @@ public class NCoreClient {
         for (Header header : headers) {
             if (header.getName().equals("Set-Cookie") && header.getValue().startsWith("PHPSESSID=")) {
                 phpSessionId = header.getValue().split("PHPSESSID=")[1].replace("; path=/", "");
-                System.out.println("PHPSESSID=" + phpSessionId);
+                logger.debug("PHPSESSID=" + phpSessionId);
             }
         }
     }
 
     public void logout() {
-        System.out.println(userName+" has logged out");
+        logger.info(userName+" has logged out");
         httpUtils.doGet(BASE_URL + logoutUrl, getDefaultHeader());
     }
 
@@ -105,48 +103,82 @@ public class NCoreClient {
         return headers;
     }
 
-    public void populateHrTorrents() throws IOException, InterruptedException {
-        System.out.println("Populate hit&run torrents");
+    public void populateHrTorrents(){
+        logger.info("Populate hit&run torrents");
         HttpResponse response = httpUtils.doGet(HR_URL, getDefaultHeader());
 
         String content = httpUtils.getContent(response);
 
-        Document doc = Jsoup.parse(content);
+        Document doc = Jsoup.parseBodyFragment(content);
+
+        //Elmentjük a kijelentkezés linkjét, mert ez sessiononként egyedi
+        logoutUrl = doc.select("a#menu_11").attr("href");
+        logger.debug("Logout url:" + logoutUrl);
+
         HTMLUtils.findTorrents(doc, hrTorrents);
         setTorrentName(hrTorrents);
-        setInfoBarImg(hrTorrents);
+        //setInfoBarImg(hrTorrents);
     }
 
     private void setInfoBarImg(List<Torrent> hrTorrents) {
-        System.out.println("setInfoBarImg");
+        logger.info("setInfoBarImg");
         for (Torrent torrent: hrTorrents) {
             HttpResponse response = httpUtils.doGet(BASE_URL+torrent.getPageHREF(),getDefaultHeader());
             String content = httpUtils.getContent(response);
 
-            torrent.setInforBarImg(Jsoup.parse(content).selectFirst(".inforbar_img img").attr("src"));
-        }
-
-    }
-
-    private void setTorrentName(List<Torrent> hrTorrents) throws IOException, InterruptedException {
-        for(Torrent t : hrTorrents){
-            String fajlNev = "";
             try{
-                fajlNev = download(t);
+                torrent.setInforBarImg(Jsoup.parse(content).selectFirst(".inforbar_img img").attr("src"));
             }
-            catch (Exception e){
-                e.printStackTrace();
-                continue;
+            catch(Exception e){
+                logger.error("Infobar image not found!");
             }
 
-            if(fajlNev == "") continue;
-            String name = getTorrentName(DOWNLOAD_LOCATION+fajlNev);
-
-            t.setTorrentNev(name);
         }
+
     }
 
-    public String download(Torrent torrent) {
+    private void setTorrentName(List<Torrent> hrTorrents) {
+
+        try(var executor = Executors.newVirtualThreadPerTaskExecutor()){
+
+            hrTorrents
+                    .parallelStream()
+                    .forEach( t ->{
+
+                        executor.execute(() -> {
+
+                            String fajlNev = "";
+                            try{
+                                logger.debug("Start download");
+                                fajlNev = download(t);
+                                logger.debug("Finish download");
+                            }
+                            catch (Exception e){
+                                e.printStackTrace();
+                                return;
+                            }
+
+                            if(fajlNev == "") return;
+                            logger.debug("Start get name");
+                            String name = null;
+                            try {
+                                name = getTorrentName(DOWNLOAD_LOCATION+fajlNev);
+                            } catch (IOException e) {
+                            }
+                            logger.debug("Finish get name");
+
+                            t.setTorrentNev(name);
+                        });
+
+                    });
+
+            executor.shutdown();
+
+        }
+
+    }
+
+    public synchronized String download(Torrent torrent) {
         InputStream is = null;
         FileOutputStream fos = null;
         try {
@@ -159,17 +191,18 @@ public class NCoreClient {
             String filename = heads[0].getValue().replace("attachment; filename=\"", "").replace("\"", "");
             is = response.getEntity().getContent();
             String filePath = DOWNLOAD_LOCATION + filename;
-            fos = new FileOutputStream(new File(filePath));
-            int inByte;
-            while ((inByte = is.read()) != -1) {
-                fos.write(inByte);
+
+            if(!new File(filePath).exists()){
+                fos = new FileOutputStream(new File(filePath));
+                int inByte;
+                while ((inByte = is.read()) != -1) {
+                    fos.write(inByte);
+                }
             }
+
             return filename;
-        } catch (IOException ex) {
-            Logger.getLogger(NCoreClient.class.getName()).log(Level.SEVERE, null, ex);
-            ex.printStackTrace();
-        } catch (UnsupportedOperationException ex) {
-            Logger.getLogger(NCoreClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | UnsupportedOperationException ex) {
+            logger.error(ex);
         } finally {
             try {
                 if (is != null) {
@@ -181,7 +214,7 @@ public class NCoreClient {
                 }
 
             } catch (IOException ex) {
-                Logger.getLogger(NCoreClient.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex);
             }
         }
         return "";
@@ -193,28 +226,117 @@ public class NCoreClient {
         Map infoMap = (Map) torrentInfo.get("info");
         String name = new String((byte[])infoMap.get("name"));
         torrentFilteStream.close();
-        System.out.println("name: " + name);
+        logger.debug("name: " + name);
         return name;
     }
+
+    public List<Torrent> search(String query) {
+        logger.info("Search by query:"+query);
+        Map<String,String> params = new HashMap<>();
+        params.put("nyit_filmek_resz","true");
+        params.put("nyit_sorozat_resz","true");
+        params.put("mire",query);
+        params.put("miben","name");
+        params.put("tipus","all_own");
+        HttpResponse response = httpUtils.doPost(BASE_URL+"torrents.php",params);
+
+        String content = httpUtils.getContent(response);
+
+        Document doc = Jsoup.parseBodyFragment(content);
+        Elements torrentBoxes = doc.select(".box_torrent");
+        logger.info("Torrent size:"+torrentBoxes.size());
+
+        ArrayList<Torrent> result = new ArrayList<>(torrentBoxes.size());
+        for(Element element : torrentBoxes){
+            Element link = element.selectFirst(".torrent_txt>a");
+            String idStr = element.select(".box_nev2>div").attr("id").replace("borito","");
+            Torrent t = new Torrent(link.attr("title"));
+            t.setId(Integer.parseInt(idStr));
+            t.setPageHREF(link.attr("href"));
+            logger.debug("Found:"+t);
+            result.add(t);
+
+        }
+
+        return result;
+    }
+
+    public List<Torrent> searchByImd(String imdbId){
+        logger.info("Search by query:"+imdbId);
+        Map<String,String> params = new HashMap<>();
+        params.put("nyit_filmek_resz","true");
+        params.put("nyit_sorozat_resz","true");
+        params.put("mire",imdbId);
+        params.put("miben","imdb");
+        params.put("tipus","all_own");
+        HttpResponse response = httpUtils.doPost(BASE_URL+"torrents.php",params);
+
+        String content = httpUtils.getContent(response);
+
+        Document doc = Jsoup.parseBodyFragment(content);
+        Elements torrentBoxes = doc.select(".box_torrent");
+        logger.info("Torrent size:"+torrentBoxes.size());
+
+        ArrayList<Torrent> result = new ArrayList<>(torrentBoxes.size());
+        for(Element element : torrentBoxes){
+            Element link = element.selectFirst(".torrent_txt>a");
+            String idStr = element.select(".box_nev2>div").attr("id").replace("borito","");
+            Torrent t = new Torrent(link.attr("title"));
+            t.setId(Integer.parseInt(idStr));
+            t.setPageHREF(link.attr("href"));
+            logger.debug("Found:"+t);
+            result.add(t);
+
+        }
+
+        return result;
+    }
+
 
     public List<Torrent> getHrTorrents() {
         return hrTorrents;
     }
-    
+
     public void addRun(){
         running++;
     }
-    
+
     public void removeRun(){
         running--;
     }
-    
+
     public int getRunning(){
         return running;
     }
-    
+
     public String getUserName(){
         return userName;
+    }
+
+    public Optional<Torrent> getBest(List<Torrent> torrents) {
+
+        Optional<Torrent> result;
+
+        result = find(torrents,"720p");
+
+        if(!result.isPresent()){
+            result = find(torrents,"1080p");
+            if(!result.isPresent()){
+                return torrents.size() >0 ? Optional.of(torrents.get(0)) : Optional.empty();
+            }
+        }
+
+        return result;
+    }
+
+    private Optional<Torrent> find(List<Torrent> torrents, String resolution){
+        for (Torrent t: torrents) {
+            if(t.getTorrentNev().contains(resolution)){
+                return Optional.of(t);
+            }
+        }
+
+        return Optional.empty();
     }
 
 }

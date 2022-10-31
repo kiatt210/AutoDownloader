@@ -22,12 +22,16 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author KICSI
  */
 public class HTTPUtils {
+
+    private static Logger logger = LogManager.getLogger();
 
     HttpClient client;
     public HTTPUtils (){
@@ -39,77 +43,82 @@ public class HTTPUtils {
         httpClientBuilder.setDefaultRequestConfig(requestBuilder.build());
         this.client = httpClientBuilder.build();
     }
-    
+
     public HttpResponse doPost(String url,Map<String,String> parameters){
         HttpPost post = new HttpPost(url);
         ArrayList<NameValuePair> postParameters = new ArrayList<>();
         parameters.forEach((key, value) -> {
             postParameters.add(new BasicNameValuePair(key, value));
         });
-        
+
         try {
             post.setEntity(new UrlEncodedFormEntity(postParameters, "UTF-8"));
+            logger.debug("Start post");
             return client.execute(post);
         } catch (IOException ex) {
-            System.out.println("Error in sending post to "+url+"\n"+ex.getMessage());
-        } 
+            logger.error("Error in sending post to "+url+"\n"+ex.getMessage());
+        }
         return null;
     }
-    
+
     public String getContent(HttpResponse response) {
+        return getContent(response,"\r");
+    }
+
+    public String getContent(HttpResponse response,String lineSeparator) {
         BufferedReader rd = null;
         try {
-            
+
             rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
             StringBuilder responseStr = new StringBuilder();
             String line;
-            
+
             while ((line = rd.readLine()) != null) {
                 responseStr.append(line);
-                responseStr.append('\r');
+                responseStr.append(lineSeparator);
             }
 
             return responseStr.toString();
         } catch (IOException ex) {
-            System.out.println(ex);
+            logger.info(ex);
         } catch (UnsupportedOperationException ex) {
-            System.out.println(ex);
+            logger.info(ex);
         } finally {
             try {
                 Objects.requireNonNull(rd).close();
             } catch (IOException ex) {
-                System.out.println(ex);
+                logger.info(ex);
             }
         }
         return null;
     }
-    
+
     public HttpResponse doGet(String url, Map<String,String> headers) {
         try {
-            System.out.println("Start get url=" + url);
+            logger.debug("Start get url=" + url);
             HttpGet get = new HttpGet(url);
+            logger.debug("Populate headers");
             if(headers != null){
                 headers.forEach((key, value) -> get.setHeader(key, value));
             }
-            
+            logger.debug("Execute get");
             HttpResponse response = client.execute(get);
-//            printHeaders(response);
-            
-            System.out.println("Request executed");
-            
+
+            logger.debug("Request executed");
+
             return response;
         } catch (IOException ex) {
-            System.out.println("Error while sending get to "+url+"\n"+ex.getMessage());
+            logger.error("Error while sending get to "+url+"\n"+ex.getMessage());
         }
         return null;
     }
-    
+
     private void printHeaders(HttpResponse response) {
         //get all headers
         Header[] headers = response.getAllHeaders();
         for (Header header : headers) {
-            System.out.println("Key: " + header.getName() + " = Value:" + header.getValue());
+            logger.debug("Key: " + header.getName() + " = Value:" + header.getValue());
         }
     }
-    
+
 }

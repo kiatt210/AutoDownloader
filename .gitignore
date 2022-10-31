@@ -1,3 +1,4 @@
 .idea/**
 target/**
 AutoDownloader.iml
+/src/main/resources/secrets.json
