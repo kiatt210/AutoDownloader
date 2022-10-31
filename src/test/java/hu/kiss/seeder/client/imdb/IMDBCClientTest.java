@@ -1,4 +1,4 @@
-package hu.kiss.seeder.client;
+package hu.kiss.seeder.client.imdb;
 
 import hu.kiss.seeder.client.IMDBClient;
 import org.junit.Assert;
