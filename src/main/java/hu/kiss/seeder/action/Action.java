@@ -1,10 +1,12 @@
 package hu.kiss.seeder.action;
 
-import hu.kiss.seeder.data.DelugeTorrent;
+import hu.kiss.seeder.client.QbitorrentClient;
+import hu.kiss.seeder.data.BitTorrent;
+import hu.kiss.seeder.data.TorrentComposite;
 
 public interface Action {
 
-    public void init(Object... params);
+    void init(QbitorrentClient qClient);
 
-    public void execute(DelugeTorrent torrent);
+    public void execute(TorrentComposite torrent);
 }

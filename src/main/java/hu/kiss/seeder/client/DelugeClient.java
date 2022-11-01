@@ -7,15 +7,13 @@ package hu.kiss.seeder.client;
 
 import hu.kiss.seeder.client.deluge.DTorrentStore;
 import hu.kiss.seeder.mongo.DBSynchronizer;
-import jBittorrentAPI.BDecoder;
-import hu.kiss.seeder.data.DelugeTorrent;
+import hu.kiss.seeder.data.BitTorrent;
 import hu.kiss.seeder.data.Status;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -29,7 +27,7 @@ public class DelugeClient {
 
 
     private static final String TARTOS_LABEL = "tartos";
-    private List<DelugeTorrent> dTorrents = new ArrayList<>();
+    private List<BitTorrent> dTorrents = new ArrayList<>();
     private List<String> tartosIds = new ArrayList<>();
 
     HashMap<String, String> options = new HashMap<>();
@@ -57,7 +55,7 @@ public class DelugeClient {
                     info.append(lines[j]).append("\n");
                 }
                 i+=5;
-                DelugeTorrent dt = new DelugeTorrent(info.toString());
+                BitTorrent dt = new BitTorrent(info.toString());
                 dTorrents.add(dt);
                 store.add(dt);
                 if (dt.getStatus() != null && !dt.getStatus().equals(Status.PAUSED)) {
@@ -157,7 +155,7 @@ public class DelugeClient {
 
     }
 
-    public List<DelugeTorrent> getSeededTorrents() {
+    public List<BitTorrent> getSeededTorrents() {
         return dTorrents;
     }
 

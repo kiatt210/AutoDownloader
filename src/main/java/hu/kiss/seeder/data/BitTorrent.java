@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  *
  * @author KICSI
  */
-public class DelugeTorrent {
+public class BitTorrent {
 
     private String nev;
     private String id;
@@ -19,7 +19,7 @@ public class DelugeTorrent {
     private String category;
     private LocalDateTime additionDate;
 
-    public DelugeTorrent(String info) {
+    public BitTorrent(String info) {
         System.out.println("Cretae new Deluge Torrent from: " + info);
         String[] lines = info.split("\n");
         for (String line : lines) {
@@ -37,7 +37,7 @@ public class DelugeTorrent {
         System.out.println("staus: " + status);
     }
 
-    public DelugeTorrent() {
+    public BitTorrent() {
 
     }
 
@@ -83,10 +83,10 @@ public class DelugeTorrent {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof DelugeTorrent) {
+        if (obj instanceof BitTorrent) {
             //System.out.println(this.nev+" =? "+((DelugeTorrent) obj).getNev());
-            if(this.nev == null || ((DelugeTorrent)(DelugeTorrent) obj).getNev() == null) return false;
-            return this.nev.equals(((DelugeTorrent) obj).getNev());
+            if(this.nev == null || ((BitTorrent)(BitTorrent) obj).getNev() == null) return false;
+            return this.nev.equals(((BitTorrent) obj).getNev());
         } else {
             return super.equals(obj);
         }

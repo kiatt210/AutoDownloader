@@ -1,7 +1,7 @@
 package hu.kiss.seeder.mongo;
 
 
-import hu.kiss.seeder.data.DelugeTorrent;
+import hu.kiss.seeder.data.BitTorrent;
 import hu.kiss.seeder.data.Torrent;
 
 import java.sql.*;
@@ -72,7 +72,7 @@ public class TorrentDb {
         }
     }
 
-    public void remove(DelugeTorrent torrent){
+    public void remove(BitTorrent torrent){
         String deleteStmt = "DELETE FROM  torrent where nev = ?";
         try{
             PreparedStatement stmt = conn.prepareCall(deleteStmt);

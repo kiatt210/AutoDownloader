@@ -3,31 +3,32 @@ package hu.kiss.seeder.client;
 import com.fasterxml.jackson.core.type.TypeReference;
 import hu.kiss.seeder.client.qbit.GeneralInfo;
 import hu.kiss.seeder.client.qbit.HTTPUtils;
-import hu.kiss.seeder.client.qbit.TrackerInfo;
-import hu.kiss.seeder.data.DelugeTorrent;
+import hu.kiss.seeder.data.BitTorrent;
 import hu.kiss.seeder.data.Status;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class QbitorrentClient implements TorrentClientI{
+
+    private static Logger logger = LogManager.getLogger();
 
     private String sessionId;
     private final String urlString = "http://192.168.0.20:8112";
 
     public static final ArrayList<String> states = new ArrayList<>(Arrays.asList("all", "downloading", "completed", "seeding", "pause", "active", "inactive"));
     private List<String> tartosIds;
-    List<DelugeTorrent> seededTorrents;
+    List<BitTorrent> seededTorrents;
 
     public QbitorrentClient(){
         login();
@@ -58,72 +59,47 @@ public class QbitorrentClient implements TorrentClientI{
         List<GeneralInfo> torrents = HTTPUtils.getRequest(urlString + "/api/v2/torrents/info?filter=" + filter, sessionId, new TypeReference<List<GeneralInfo>>() {
         }, true);
 
-        seededTorrents = new ArrayList<>();
+        seededTorrents = Collections.synchronizedList(new ArrayList<>());
+        logger.debug("Start populate torrents");
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
 
-            torrents.parallelStream().forEach(
+            torrents.stream().forEach(
                     t -> {
                         executor.execute(() -> {
-                            DelugeTorrent torrent = new DelugeTorrent();
+                            BitTorrent torrent = new BitTorrent();
                             torrent.setNev(t.getName());
                             torrent.setId(t.getHash());
                             torrent.setAdditionDate(LocalDateTime.ofInstant(Instant.ofEpochSecond(t.getAdded_on()), ZoneId.systemDefault()));
                             torrent.setCategory(t.getCategory());
                             switch (t.getState()) {
                                 case "uploading":
-                                    torrent.setStatus(Status.SEED);
-                                    break;
-                                case "pausedUP":
-                                    torrent.setStatus(Status.PAUSED);
-                                    break;
-                                case "queuedUP":
-                                    torrent.setStatus(Status.QUEUED);
-                                    break;
                                 case "stalledUP":
-                                    torrent.setStatus(Status.SEED);
-                                    break;
-                                case "checkingUP":
-                                    torrent.setStatus(Status.CHECKING);
-                                    break;
                                 case "forcedUP":
                                     torrent.setStatus(Status.SEED);
                                     break;
-                                case "metaDL":
-                                    torrent.setStatus(Status.DOWNLOAD);
-                                    break;
+                                case "pausedUP":
                                 case "pausedDL":
-                                    torrent.setStatus(Status.PAUSED);
-                                    break;
-                                case "queuedDL":
-                                    torrent.setStatus(Status.QUEUED);
-                                    break;
-                                case "stalledDL":
-                                    torrent.setStatus(Status.DOWNLOAD);
-                                    break;
-                                case "checkingDL":
-                                    torrent.setStatus(Status.CHECKING);
-                                    break;
-                                case "forcedDL":
-                                    torrent.setStatus(Status.DOWNLOAD);
-                                    break;
-                                case "checkingResumeData":
-                                    torrent.setStatus(Status.CHECKING);
-                                    break;
                                 case "moving":
-                                    torrent.setStatus(Status.PAUSED);
-                                    break;
-                                case "downloading":
-                                    torrent.setStatus(Status.DOWNLOAD);
-                                    break;
                                 case "pause":
                                     torrent.setStatus(Status.PAUSED);
                                     break;
+                                case "queuedUP":
+                                case "queuedDL":
+                                    torrent.setStatus(Status.QUEUED);
+                                    break;
+                                case "checkingUP":
+                                case "checkingDL":
+                                case "checkingResumeData":
+                                    torrent.setStatus(Status.CHECKING);
+                                    break;
+                                case "metaDL":
+                                case "stalledDL":
+                                case "forcedDL":
+                                case "downloading":
+                                    torrent.setStatus(Status.DOWNLOAD);
+                                    break;
                                 case "error":
-                                    torrent.setStatus(Status.ERROR);
-                                    break;
                                 case "missingFiles":
-                                    torrent.setStatus(Status.ERROR);
-                                    break;
                                 default:
                                     torrent.setStatus(Status.ERROR);
                                     break;
@@ -132,8 +108,8 @@ public class QbitorrentClient implements TorrentClientI{
                         });
                     }
             );
-            executor.shutdown();
-    }
+                logger.debug("Client torrents: "+this.seededTorrents.size() +" : Rest response torrents: "+torrents.size());
+        }
     }
 
     @Override
@@ -168,7 +144,7 @@ public class QbitorrentClient implements TorrentClientI{
     }
 
     @Override
-    public List<DelugeTorrent> getSeededTorrents() {
+    public List<BitTorrent> getSeededTorrents() {
         return seededTorrents;
     }
 

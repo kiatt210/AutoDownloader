@@ -4,17 +4,13 @@ package hu.kiss.seeder.client.deluge;
 import hu.kiss.seeder.client.QbitorrentClient;
 import static org.junit.jupiter.api.Assertions.*;
 
-import hu.kiss.seeder.data.DelugeTorrent;
-import hu.kiss.seeder.data.Torrent;
+import hu.kiss.seeder.data.BitTorrent;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 
 public class DelugeRPCClientTest {
@@ -30,20 +26,20 @@ public class DelugeRPCClientTest {
     @Test
     public void testRunningSize(){
         QbitorrentClient client = new QbitorrentClient();
-        assertEquals(24,client.getRunningSize());
+        assertTrue(client.getRunningSize() > 0);
     }
 
     @Test
     public void testTartosIds(){
         QbitorrentClient client = new QbitorrentClient();
-        assertEquals(1,client.getTartosIds().size());
+        assertTrue(client.getTartosIds().size() > 0);
     }
 
     @Test
     public void testSeedingTorrents(){
         QbitorrentClient client = new QbitorrentClient();
         client.populateSeededTorrents();
-        assertEquals(1,client.getSeededTorrents().size());
+        assertTrue(client.getSeededTorrents().size() > 0);
     }
 
     @Test
@@ -92,7 +88,7 @@ public class DelugeRPCClientTest {
     public void testSuperSeed(){
         QbitorrentClient client = new QbitorrentClient();
         client.populateSeededTorrents();
-        DelugeTorrent t = client.getSeededTorrents().get(0);
+        BitTorrent t = client.getSeededTorrents().get(0);
         client.superSeed(t.getId());
         client.forceStart(t.getId());
     }

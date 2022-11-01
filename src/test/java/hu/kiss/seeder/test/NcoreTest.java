@@ -5,17 +5,13 @@
  */
 package hu.kiss.seeder.test;
 
-import hu.kiss.seeder.action.StopPauseAction;
 import hu.kiss.seeder.auth.Secret;
 import hu.kiss.seeder.client.NCoreClient;
-import hu.kiss.seeder.data.DelugeTorrent;
 import hu.kiss.seeder.data.Torrent;
-import hu.kiss.seeder.mongo.TorrentDb;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.AfterAll;
@@ -26,8 +22,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.stream.Stream;
 
 /**
  *
@@ -52,13 +46,6 @@ public class NcoreTest {
     @Test
     public void testPopulateTorrents(){
         assertTimeout(Duration.ofSeconds(20), () -> ncClient.populateHrTorrents());
-    }
-
-    @Test
-    public void testTorrents() throws IOException, InterruptedException {
-        ncClient.populateHrTorrents();
-        long heavenTorrents = ncClient.getHrTorrents().stream().filter(t -> t.getTorrentNev().contains("Heaven")).count();
-        assertEquals(1,heavenTorrents);
     }
 
     @Test

@@ -5,19 +5,14 @@
  */
 package hu.kiss.seeder.test;
 
-import hu.kiss.seeder.data.DelugeTorrent;
+import hu.kiss.seeder.data.BitTorrent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import hu.kiss.seeder.data.Status;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
+
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+
 import org.json.simple.parser.ParseException;
 
 /**
@@ -132,7 +127,7 @@ public class DelugeTest {
             + "Tracker status: ncore.cc: Announce OK\n"
             + "deluge-console info  6.53s user 0.36s system 96% cpu 7.114 total";
 
-    private static List<DelugeTorrent> dTorrents = new ArrayList<DelugeTorrent>();
+    private static List<BitTorrent> dTorrents = new ArrayList<BitTorrent>();
 
     public static void main(String args[]) throws FileNotFoundException, IOException, ParseException {
         String[] lines = sampleInfoResponse.split("\n");
@@ -146,7 +141,7 @@ public class DelugeTest {
                 }
                 i+=5;
                 System.out.println("Start add");
-                DelugeTorrent dt = new DelugeTorrent(info);
+                BitTorrent dt = new BitTorrent(info);
                 dTorrents.add(dt);
                 if (!dt.getStatus().equals(Status.PAUSED)) {
 //                    isUpdatable = true;

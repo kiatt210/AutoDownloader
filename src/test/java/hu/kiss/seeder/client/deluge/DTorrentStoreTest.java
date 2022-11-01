@@ -1,6 +1,6 @@
 package hu.kiss.seeder.client.deluge;
 
-import hu.kiss.seeder.data.DelugeTorrent;
+import hu.kiss.seeder.data.BitTorrent;
 import hu.kiss.seeder.mongo.DBSynchronizer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -22,7 +22,7 @@ public class DTorrentStoreTest {
         DBSynchronizer synchronizer = mock(DBSynchronizer.class);
         store.addObserver(synchronizer);
         Assertions.assertEquals(1,store.countObservers());
-        DelugeTorrent torrent = new DelugeTorrent();
+        BitTorrent torrent = new BitTorrent();
         store.add(torrent);
 
         verify(synchronizer,times(1)).update(store,torrent);

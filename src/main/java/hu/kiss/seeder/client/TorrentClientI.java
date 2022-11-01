@@ -1,6 +1,6 @@
 package hu.kiss.seeder.client;
 
-import hu.kiss.seeder.data.DelugeTorrent;
+import hu.kiss.seeder.data.BitTorrent;
 
 import java.util.List;
 import java.util.Map;
@@ -12,7 +12,7 @@ public interface TorrentClientI {
     public void addTorrent(String torrentFile, Map<String,String> params);
     public void removeTorrent(String id);
     public void pauseTorrent(String id);
-    public List<DelugeTorrent> getSeededTorrents();
+    public List<BitTorrent> getSeededTorrents();
     public Boolean getIsUpdatable();
     public List<String> getTartosIds();
     public int getRunningSize();

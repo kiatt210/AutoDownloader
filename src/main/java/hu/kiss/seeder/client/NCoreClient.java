@@ -38,7 +38,7 @@ public class NCoreClient {
     private static final String HOME_URL = "https://ncore.pro/index.php";
     private static final String HR_URL = "https://ncore.pro/hitnrun.php";
     private static final String BASE_URL = "https://ncore.pro/";
-    public static /*final*/ String DOWNLOAD_LOCATION = "/home/seeder/torrents/";
+    public static /*final*/ String DOWNLOAD_LOCATION = File.separatorChar+"home"+File.separatorChar+"seeder"+File.separatorChar+"torrents"+File.separatorChar;
     private String downloadLink = "torrents.php?action=download&id=${id}&key=${passkey}";
 
     private static Logger logger = LogManager.getLogger();

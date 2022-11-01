@@ -1,28 +1,26 @@
 package hu.kiss.seeder.client.deluge;
 
-import hu.kiss.seeder.data.DelugeTorrent;
-import hu.kiss.seeder.mongo.TorrentDb;
+import hu.kiss.seeder.data.BitTorrent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
-import java.util.Observer;
 
 public class DTorrentStore extends Observable {
 
-    private List<DelugeTorrent> torrents;
+    private List<BitTorrent> torrents;
 
     public DTorrentStore(){
         this.torrents = new ArrayList<>();
     }
 
-    public void add(DelugeTorrent torrent){
+    public void add(BitTorrent torrent){
         this.torrents.add(torrent);
         setChanged();
         notifyObservers(torrent);
     }
 
-    public List<DelugeTorrent> getTorrents(){
+    public List<BitTorrent> getTorrents(){
         return torrents;
     }
 

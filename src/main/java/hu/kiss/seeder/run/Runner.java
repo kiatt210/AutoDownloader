@@ -15,8 +15,9 @@ import hu.kiss.seeder.client.NCoreClient;
 import hu.kiss.seeder.client.QbitorrentClient;
 import hu.kiss.seeder.client.TorrentClientI;
 import hu.kiss.seeder.client.mqtt.PahoClient;
-import hu.kiss.seeder.data.DelugeTorrent;
+import hu.kiss.seeder.data.BitTorrent;
 import hu.kiss.seeder.data.Torrent;
+import hu.kiss.seeder.data.TorrentComposite;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -41,13 +42,15 @@ public class Runner {
     private static final String MY_MOVIES_CATEGORY="Filmek Atinak";
     private NCoreClient ncClientKiatt;
     private NCoreClient ncClientDake;
-    private TorrentClientI dClient;
+    private QbitorrentClient bitTorrentClient;
     private PahoClient pahoClient;
 
     private PahoClient client;
     private List<Action> actions;
 
     private static Logger logger = LogManager.getLogger();
+    private List<TorrentComposite> torrents;
+
     public Runner() {
     }
 
@@ -95,29 +98,29 @@ public class Runner {
             return;
         }
 
-        logger.info("Seeded torrent size: " + dClient.getSeededTorrents().size());
-        logger.info("Running torrent size: " + dClient.getRunningSize());
+        logger.info("Seeded torrent size: " + bitTorrentClient.getSeededTorrents().size());
+        logger.info("Running torrent size: " + bitTorrentClient.getRunningSize());
 
-//        stopAndPause(ncClientKiatt, ncClientDake, dClient);
+        callActions();
 
-        if (dClient.getIsUpdatable() && dClient.getRunningSize() < limit) {
+        if (bitTorrentClient.getIsUpdatable() && bitTorrentClient.getRunningSize() < limit) {
 
-            int addable = MAX_ADDABLE_PER_USER - dClient.getRunningSize();
+            int addable = MAX_ADDABLE_PER_USER - bitTorrentClient.getRunningSize();
             addable = Math.max(addable,0);
             logger.info("Addable: " + addable);
             int maxAddable = addable == 0 ? 0 : addable / 2;
             logger.info("Max addable: " + maxAddable);
-            addDownloads(ncClientKiatt, dClient);
-            addDownloads(ncClientDake, dClient);
+            addDownloads(ncClientKiatt, bitTorrentClient);
+            addDownloads(ncClientDake, bitTorrentClient);
 
         }
 
         refreshMyMovies();
 
-        logger.info("Seeded torrent size: " + dClient.getSeededTorrents().size());
-        logger.info("Running torrent size: " + dClient.getRunningSize());
+        logger.info("Seeded torrent size: " + bitTorrentClient.getSeededTorrents().size());
+        logger.info("Running torrent size: " + bitTorrentClient.getRunningSize());
 
-        logData(dClient);
+        logData(bitTorrentClient);
 
         ncClientKiatt.logout();
         ncClientDake.logout();
@@ -129,7 +132,7 @@ public class Runner {
         sendMqttStart();
         ncClientKiatt = new NCoreClient();
         ncClientDake = new NCoreClient();
-        dClient = new QbitorrentClient();
+        bitTorrentClient = new QbitorrentClient();
         try(var executor = Executors.newVirtualThreadPerTaskExecutor()){
             executor.execute(()-> {
                         ncClientKiatt.login(Secret.all().get(0));
@@ -145,9 +148,42 @@ public class Runner {
             );
 
             //Ki gyűjtjük a torrent kliensben lévő torrenteket.
-            executor.execute(() -> dClient.populateSeededTorrents());
-            executor.shutdown();
+            executor.execute(() -> bitTorrentClient.populateSeededTorrents());
         }
+
+        populateTorrentComposites();
+    }
+
+    private void populateTorrentComposites(){
+        torrents = Collections.synchronizedList(new ArrayList<>());
+        //Populate from ncore Hit&Run
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+
+            ncClientKiatt.getHrTorrents().stream().forEach(t -> {
+                executor.submit(() -> {
+                    torrents.add(TorrentComposite.create(t, bitTorrentClient.getSeededTorrents()));
+                });
+            });
+
+            ncClientDake.getHrTorrents().stream().forEach(t -> {
+                executor.submit(() -> {
+                    torrents.add(TorrentComposite.create(t, bitTorrentClient.getSeededTorrents()));
+                });
+            });
+
+        }
+
+        //Append the rest from bittorrent
+        bitTorrentClient.getSeededTorrents().stream()
+                .filter(bt ->
+                        torrents.stream()
+                                .filter(tc -> tc.getId().equals(bt.getId()))
+                                .findAny()
+                                .isEmpty())
+                .forEach(bt -> {
+                    TorrentComposite tc = new TorrentComposite(new Torrent(bt.getNev()), bt);
+                    torrents.add(tc);
+                });
 
     }
 
@@ -155,21 +191,21 @@ public class Runner {
         actions = new ArrayList<Action>();
 
         Action stopPauseAction = new StopPauseAction();
-        stopPauseAction.init(ncClientKiatt,ncClientDake,dClient);
+        stopPauseAction.init(bitTorrentClient);
         actions.add(stopPauseAction);
 
         Action addTagAction = new RSSDownloadAddTagAction();
-        addTagAction.init(dClient);
+        addTagAction.init(bitTorrentClient);
         actions.add(addTagAction);
 
         Action warnAction = new WarnedAction();
-        warnAction.init(ncClientKiatt,ncClientDake,dClient);
+        warnAction.init(bitTorrentClient);
         actions.add(warnAction);
     }
 
-    private void stopAndPause(NCoreClient nClientKiatt, NCoreClient nClientDake , TorrentClientI dClient) {
+    private void callActions() {
 
-        dClient.getSeededTorrents().stream().forEach(torrent -> {
+        torrents.stream().forEach(torrent -> {
 
             actions.forEach( a -> a.execute(torrent));
         });
@@ -177,7 +213,7 @@ public class Runner {
 
     private void addDownloads(NCoreClient nClient, TorrentClientI dClient) {
         logger.info("Start addDownloads for " + nClient.getUserName());
-        DelugeTorrent tmpTorrent = new DelugeTorrent();
+        BitTorrent tmpTorrent = new BitTorrent();
 
         nClient.getHrTorrents().stream().forEach(torrent -> {
             tmpTorrent.setNev(torrent.getTorrentNev());
@@ -215,7 +251,7 @@ public class Runner {
 
     private void refreshMyMovies(){
         logger.info("Refresh my movies");
-        int currentMoviesCount = this.dClient.getCountByCategory(MY_MOVIES_CATEGORY);
+        int currentMoviesCount = this.bitTorrentClient.getCountByCategory(MY_MOVIES_CATEGORY);
         logger.info("Current count:"+currentMoviesCount);
 
         Map<String,String> parameters = new HashMap<String, String>();
@@ -232,7 +268,7 @@ public class Runner {
                 if(torrent.isPresent()){
                     String fileName = ncClientKiatt.download(torrent.get());
                     if(fileName != ""){
-                        dClient.addTorrent(NCoreClient.DOWNLOAD_LOCATION + fileName,parameters);
+                        bitTorrentClient.addTorrent(NCoreClient.DOWNLOAD_LOCATION + fileName,parameters);
                     }
                 }
             }

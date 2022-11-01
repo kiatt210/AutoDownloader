@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,13 +45,12 @@ public class Secret {
         ObjectMapper objectMapper = new ObjectMapper();
 
         ClassLoader classLoader = Secret.class.getClassLoader();
-        URL resource = classLoader.getResource("secrets.json");
+        InputStream resource = classLoader.getResourceAsStream("secrets.json");
 
         try {
+            return objectMapper.readValue(resource, new TypeReference<List<Secret>>() {});
 
-            return objectMapper.readValue(new File(resource.toURI()), new TypeReference<List<Secret>>() {});
-
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
