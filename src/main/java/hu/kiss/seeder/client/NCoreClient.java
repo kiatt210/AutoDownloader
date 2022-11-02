@@ -104,7 +104,7 @@ public class NCoreClient {
     }
 
     public void populateHrTorrents(){
-        logger.info("Populate hit&run torrents");
+        logger.debug("Populate hit&run torrents");
         HttpResponse response = httpUtils.doGet(HR_URL, getDefaultHeader());
 
         String content = httpUtils.getContent(response);
