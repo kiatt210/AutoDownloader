@@ -115,6 +115,7 @@ public class NCoreClient {
         logoutUrl = doc.select("a#menu_11").attr("href");
         logger.debug("Logout url:" + logoutUrl);
 
+        logger.info("Find torrents of "+this.userName);
         HTMLUtils.findTorrents(doc, hrTorrents);
         setTorrentName(hrTorrents);
         //setInfoBarImg(hrTorrents);

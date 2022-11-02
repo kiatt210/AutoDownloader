@@ -23,7 +23,6 @@ public class HTMLUtils {
     private static Logger logger = LogManager.getLogger();
     
     public static void findTorrents(Document hrDocument, List<Torrent> hrTorrents) {
-        logger.info("Find torrents");
         Elements torrentsE = hrDocument.select("div[class^=hnr_all]");
         logger.info("Torrents size: "+torrentsE.size());
         for (org.jsoup.nodes.Element element : torrentsE) {

@@ -117,9 +117,6 @@ public class Runner {
 
         refreshMyMovies();
 
-        logger.info("Seeded torrent size: " + bitTorrentClient.getSeededTorrents().size());
-        logger.info("Running torrent size: " + bitTorrentClient.getRunningSize());
-
         logData(bitTorrentClient);
 
         ncClientKiatt.logout();
