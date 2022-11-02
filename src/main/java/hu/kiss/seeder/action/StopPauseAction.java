@@ -29,27 +29,27 @@ public class StopPauseAction extends BaseAction{
                     && !qClient.getTartosIds().contains(torrent.getId())
                     && torrent.getNcoreTorrent().getStatus() == null
             ) {
-                logger.info("Remove - "+torrent.getNev());
+                logger.info(formatLog("Remove",torrent));
                 qClient.removeTorrent(torrent.getId());
             }
             else if(!torrent.getBitTorrent().getStatus().equals(Status.PAUSED)
                     && deletableStatuses.contains(torrent.getBitTorrent().getStatus())
                     && torrent.getNcoreTorrent().getStatus() == null
             ){
-                logger.info("Stop - "+torrent.getNev());
+                logger.info(formatLog("Stop",torrent));
                 qClient.pauseTorrent(torrent.getId());
             }
             else if(torrent.getBitTorrent().getStatus().equals(Status.PAUSED)
                     && torrent.getNcoreTorrent().getStatus() != null ){
-                logger.info("Resume - "+torrent.getNev());
+                logger.info(formatLog("Resume",torrent));
                 qClient.resumeTorrent(torrent.getId());
             }
             else {
-                logger.debug("Torrent not changed: " + torrent.getNev());
+                logger.debug(formatLog("Torrent not changed",torrent));
             }
         }
         else {
-            logger.debug("Torrent not changed: " + torrent.getNev());
+            logger.debug(formatLog("Torrent not changed",torrent));
         }
 
     }

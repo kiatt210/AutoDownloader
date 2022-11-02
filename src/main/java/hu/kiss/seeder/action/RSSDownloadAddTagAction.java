@@ -21,7 +21,7 @@ public class RSSDownloadAddTagAction extends BaseAction{
                 && torrent.getCategory() != null
                 && !torrent.getCategory().isEmpty()//Van kategóriája
                 ){
-            logger.info("Add tartós tag - "+torrent.getNev());
+            logger.info(formatLog("Add tartós tag",torrent));
             qClient.addTag(torrent.getId(),TAG);
         }
     }
