@@ -60,7 +60,7 @@ public class TorrentDb {
         String insetStmt = "INSERT INTO torrent (id,nev,image,status) values (?,?,?,?)";
         try{
             PreparedStatement preparedStatement = conn.prepareStatement(insetStmt);
-            preparedStatement.setInt(1,torrent.getId());
+            preparedStatement.setLong(1,torrent.getId());
             preparedStatement.setString(2,torrent.getTorrentNev());
             preparedStatement.setString(3,torrent.getInforBarImg());
             preparedStatement.setString(4,torrent.getStatus());

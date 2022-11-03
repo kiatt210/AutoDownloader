@@ -280,13 +280,18 @@ public class NCoreClient {
 
         ArrayList<Torrent> result = new ArrayList<>(torrentBoxes.size());
         for(Element element : torrentBoxes){
-            Element link = element.selectFirst(".torrent_txt>a");
-            String idStr = element.select(".box_nev2>div").attr("id").replace("borito","");
-            Torrent t = new Torrent(link.attr("title"));
-            t.setId(Integer.parseInt(idStr));
-            t.setPageHREF(link.attr("href"));
-            logger.debug("Found:"+t);
-            result.add(t);
+            try{
+                Element link = element.selectFirst(".torrent_txt>a");
+                String idStr = link.attr("href").split("&id=")[1];
+                Torrent t = new Torrent(link.attr("title"));
+                t.setId(Long.parseLong(idStr));
+                t.setPageHREF(link.attr("href"));
+                logger.debug("Found:"+t);
+                result.add(t);
+            }
+            catch (Exception e){
+                logger.error("Error while process "+element);
+            }
 
         }
 

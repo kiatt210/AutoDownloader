@@ -18,7 +18,7 @@ public class Torrent implements Comparable<Torrent> {
     private final static String WARN_CSS_CLASS="stopped";
 
     private String fajlNev;
-    private int id;
+    private long id;
     private String pageHREF;
     private String status;
     private int hatravan;
@@ -73,11 +73,11 @@ public class Torrent implements Comparable<Torrent> {
         return hatravan;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
