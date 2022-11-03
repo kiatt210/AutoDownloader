@@ -255,7 +255,7 @@ public class Runner {
         parameters.put("category","Filmek Atinak");
         parameters.put("tags","tartós");
 
-        if (currentMoviesCount < MY_MOVIES_COUNT) {
+        while (currentMoviesCount < MY_MOVIES_COUNT) {
             IMDBClient imdbClient = new IMDBClient();
             Collection<String> movies = imdbClient.getRandom(MY_MOVIES_COUNT-currentMoviesCount);
             //Add new torrents
@@ -266,6 +266,7 @@ public class Runner {
                     String fileName = ncClientKiatt.download(torrent.get());
                     if(fileName != ""){
                         bitTorrentClient.addTorrent(NCoreClient.DOWNLOAD_LOCATION + fileName,parameters);
+                        currentMoviesCount++;
                     }
                 }
             }
