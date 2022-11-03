@@ -17,8 +17,6 @@ public class WarnedAction extends BaseAction{
 
     private static Logger logger = LogManager.getLogger();
 
-    private TorrentClientI qClient;
-
     @Override
     public void execute(TorrentComposite torrent) {
         logger.debug("Start handle: nev - " + torrent.getNev()+" status - "+torrent.getBitTorrent().getStatus()+" id - "+torrent.getId());
