@@ -1,24 +1,21 @@
 package hu.kiss.seeder.client.qbit;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
-
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FileUtils;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -43,6 +40,7 @@ public class HTTPUtils {
             writer.close();
             os.close();
 
+            logger.debug(connection.getResponseCode()+" - "+ connection.getResponseMessage());
             connection.getInputStream();
         } catch (Exception e) {
             if (parameters == null || parameters.isEmpty()) {
@@ -162,7 +160,7 @@ public class HTTPUtils {
                 }
             }
 
-            return URLEncodedUtils.format(paramsAsNameValuePairs, UTF_8);
+            return new URIBuilder().addParameters(paramsAsNameValuePairs).build().toString();
         } catch (Exception e) {
 //            throw new QBitParametersException(parameters);
             e.printStackTrace();

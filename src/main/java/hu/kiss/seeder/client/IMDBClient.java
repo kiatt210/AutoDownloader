@@ -1,14 +1,10 @@
 package hu.kiss.seeder.client;
 
 import hu.kiss.seeder.client.utils.HTTPUtils;
-import org.apache.http.HttpResponse;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpCookie;
 import java.util.*;
 
 public class IMDBClient {
@@ -19,8 +15,8 @@ public class IMDBClient {
 
     public IMDBClient(){
         this.httpUtils = new HTTPUtils();
-        HttpResponse response = httpUtils.doGet("https://imdb.com/list/"+listId+"/export",null);
-        logger.debug(response.getStatusLine().getStatusCode());
+        ClassicHttpResponse response = httpUtils.doGet("https://imdb.com/list/"+listId+"/export",null);
+        logger.debug(response.getCode());
         list = httpUtils.getContent(response,"\r\n");
     }
 

@@ -12,15 +12,12 @@ import hu.kiss.seeder.data.Torrent;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 import jBittorrentAPI.BDecoder;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -71,10 +68,12 @@ public class NCoreClient {
         params.put("pass", password);
         params.put("set_lang", "hu");
         params.put("submitted", "1");
+        logger.debug("Params created");
+        ClassicHttpResponse response = httpUtils.doPost(LOGIN_URL, params);
+        logger.debug("Do post");
 
-        HttpResponse response = httpUtils.doPost(LOGIN_URL, params);
-        logger.debug(httpUtils.getContent(response));
-        logger.debug("Status code: " + response.getStatusLine().getStatusCode());
+        logger.debug("Get content");
+        logger.debug("Status code: " + response.getCode());
 
         setPhpSession(response);
 
@@ -83,7 +82,7 @@ public class NCoreClient {
 
     private void setPhpSession(HttpResponse response) {
         //get all headers
-        Header[] headers = response.getAllHeaders();
+        Header[] headers = response.getHeaders();
         for (Header header : headers) {
             if (header.getName().equals("Set-Cookie") && header.getValue().startsWith("PHPSESSID=")) {
                 phpSessionId = header.getValue().split("PHPSESSID=")[1].replace("; path=/", "");
@@ -105,7 +104,7 @@ public class NCoreClient {
 
     public void populateHrTorrents(){
         logger.debug("Populate hit&run torrents");
-        HttpResponse response = httpUtils.doGet(HR_URL, getDefaultHeader());
+        ClassicHttpResponse response = httpUtils.doGet(HR_URL, getDefaultHeader());
 
         String content = httpUtils.getContent(response);
 
@@ -124,7 +123,7 @@ public class NCoreClient {
     private void setInfoBarImg(List<Torrent> hrTorrents) {
         logger.info("setInfoBarImg");
         for (Torrent torrent: hrTorrents) {
-            HttpResponse response = httpUtils.doGet(BASE_URL+torrent.getPageHREF(),getDefaultHeader());
+            ClassicHttpResponse response = httpUtils.doGet(BASE_URL+torrent.getPageHREF(),getDefaultHeader());
             String content = httpUtils.getContent(response);
 
             try{
@@ -183,7 +182,7 @@ public class NCoreClient {
         InputStream is = null;
         FileOutputStream fos = null;
         try {
-            HttpResponse response = httpUtils.doGet(BASE_URL + downloadLink.replace("${id}", torrent.getId() + ""), getDefaultHeader());
+            ClassicHttpResponse response = httpUtils.doGet(BASE_URL + downloadLink.replace("${id}", torrent.getId() + ""), getDefaultHeader());
             Header[] heads = response.getHeaders("content-disposition");
             if (heads.length < 1) {
                 response.getEntity().getContent().close();
@@ -239,7 +238,7 @@ public class NCoreClient {
         params.put("mire",query);
         params.put("miben","name");
         params.put("tipus","all_own");
-        HttpResponse response = httpUtils.doPost(BASE_URL+"torrents.php",params);
+        ClassicHttpResponse response = httpUtils.doPost(BASE_URL+"torrents.php",params);
 
         String content = httpUtils.getContent(response);
 
@@ -270,7 +269,7 @@ public class NCoreClient {
         params.put("mire",imdbId);
         params.put("miben","imdb");
         params.put("tipus","all_own");
-        HttpResponse response = httpUtils.doPost(BASE_URL+"torrents.php",params);
+        ClassicHttpResponse response = httpUtils.doPost(BASE_URL+"torrents.php",params);
 
         String content = httpUtils.getContent(response);
 

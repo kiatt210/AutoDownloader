@@ -5,12 +5,13 @@ import hu.kiss.seeder.client.qbit.GeneralInfo;
 import hu.kiss.seeder.client.qbit.HTTPUtils;
 import hu.kiss.seeder.data.BitTorrent;
 import hu.kiss.seeder.data.Status;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.cookie.Cookie;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.net.CookieHandler;
-import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -37,17 +38,20 @@ public class QbitorrentClient implements TorrentClientI{
     private void login() {
         String username="admin";
         String password="Agi123";
-        CookieManager cookieManager = new CookieManager();
-        CookieHandler.setDefault(cookieManager);
+        BasicCookieStore cookieStore = new BasicCookieStore();
+
+        HttpClientContext context = HttpClientContext.create();
+        context.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put("username", username);
         parameters.put("password", password);
 
-        HTTPUtils.postRequest(urlString + "/api/v2/auth/login", null, parameters);
+        var httpUtils = new hu.kiss.seeder.client.utils.HTTPUtils();
+        httpUtils.doPostWithHandler(urlString + "/api/v2/auth/login",parameters,context);
 
-        List<HttpCookie> cookies = cookieManager.getCookieStore().getCookies();
-        for (HttpCookie cookie : cookies) {
+        List<Cookie> cookies = cookieStore.getCookies();
+        for (Cookie cookie : cookies) {
             if (cookie.getName().equals("SID")) {
                 sessionId = cookie.getValue();
             }

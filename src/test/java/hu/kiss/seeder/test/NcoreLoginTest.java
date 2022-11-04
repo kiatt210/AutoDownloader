@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTimeout;
 public class NcoreLoginTest {
 
     @Test
-//    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS)
+    @Timeout(value = 3000, unit = TimeUnit.MILLISECONDS)
     public void login(){
         Configurator.setRootLevel(Level.DEBUG);
         NCoreClient ncClient = new NCoreClient();
