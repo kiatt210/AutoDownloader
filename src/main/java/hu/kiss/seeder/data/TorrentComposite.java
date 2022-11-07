@@ -1,5 +1,7 @@
 package hu.kiss.seeder.data;
 
+import hu.kiss.seeder.client.NCoreClient;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -8,40 +10,63 @@ public class TorrentComposite {
     private Torrent ncoreTorrent;
     private BitTorrent bitTorrent;
 
-    public TorrentComposite(Torrent ncoreTorrent, BitTorrent bitTorrent) {
+    private NCoreClient nCoreClient;
+
+    public TorrentComposite(Torrent ncoreTorrent, BitTorrent bitTorrent, NCoreClient nCoreClient) {
         this.ncoreTorrent = ncoreTorrent;
         this.bitTorrent = bitTorrent;
+        this.nCoreClient = nCoreClient;
     }
 
-    public static TorrentComposite create(Torrent t, List<BitTorrent> bitTorrents){
+    public static TorrentComposite create(Torrent t, List<BitTorrent> bitTorrents, NCoreClient nCoreClient){
         return new TorrentComposite(t,
                 bitTorrents.stream()
                         .filter( q -> q.getNev().equals(t.getTorrentNev()))
                         .findAny()
-                        .orElse(new BitTorrent()));
+                        .orElse(null)
+        ,nCoreClient);
     }
 
     public Torrent getNcoreTorrent() {
         return ncoreTorrent;
     }
 
-    public BitTorrent getBitTorrent() {
-        return bitTorrent;
-    }
-
     public String getId(){
-        return bitTorrent.getId();
+        if(bitTorrent != null){
+            return bitTorrent.getId();
+        }
+        return "";
     }
 
     public String getNev(){
-        return bitTorrent.getNev();
+        if(bitTorrent != null){
+            return bitTorrent.getNev();
+        }
+        return "";
     }
 
     public LocalDateTime getAdditionDate(){
-        return bitTorrent.getAdditionDate();
+        if(bitTorrent != null){
+            return bitTorrent.getAdditionDate();
+        }
+        return LocalDateTime.MIN;
     }
 
     public String getCategory(){
-        return bitTorrent.getCategory();
+        if(bitTorrent != null){
+            return bitTorrent.getCategory();
+        }
+        return "";
+    }
+
+    public Status getStatus() {
+        if(bitTorrent != null){
+            return bitTorrent.getStatus();
+        }
+        return Status.NOT_EXIST;
+    }
+
+    public String download() {
+        return nCoreClient.download(ncoreTorrent);
     }
 }

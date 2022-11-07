@@ -16,7 +16,8 @@ public enum Status {
         DOWNLOAD("Downloading"),
         QUEUED("Queued"),
         ERROR("Error"),
-        CHECKING("Checking");
+        CHECKING("Checking"),
+        NOT_EXIST("Not exist");
     
     private String delugeString;
     

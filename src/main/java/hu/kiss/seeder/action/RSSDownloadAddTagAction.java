@@ -14,6 +14,10 @@ public class RSSDownloadAddTagAction extends BaseAction{
     private static Logger logger = LogManager.getLogger();
     private final String TAG="tartós";
 
+    public RSSDownloadAddTagAction(QbitorrentClient qClient) {
+        super(qClient);
+    }
+
     @Override
     public void execute(TorrentComposite torrent) {
         if(!qClient.getTartosIds().contains(torrent.getId()) //Nem tartós

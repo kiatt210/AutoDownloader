@@ -8,9 +8,8 @@ public abstract class BaseAction implements Action {
 
     protected QbitorrentClient qClient;
 
-    @Override
-    public void init(QbitorrentClient client) {
-        qClient = client;
+    public BaseAction(QbitorrentClient qClient){
+        this.qClient = qClient;
     }
 
     protected String formatLog(String msg, TorrentComposite torrent){

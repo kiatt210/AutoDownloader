@@ -6,7 +6,5 @@ import hu.kiss.seeder.data.TorrentComposite;
 
 public interface Action {
 
-    void init(QbitorrentClient qClient);
-
     public void execute(TorrentComposite torrent);
 }

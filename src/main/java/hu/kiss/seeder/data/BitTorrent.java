@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class BitTorrent {
 
     private String nev;
-    private String id;
+    private String id = "";
     private Status status;
     private String category;
     private LocalDateTime additionDate;

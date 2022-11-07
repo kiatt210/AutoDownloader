@@ -36,19 +36,19 @@ public class TorrentCompositTest {
 
         List<TorrentComposite> torrents = new ArrayList<>();
         ncoreTorrents.stream().forEach( t ->{
-            TorrentComposite tc = TorrentComposite.create(t,bitTorrents);
-            Assertions.assertNotNull(tc.getBitTorrent().getId(),t.getFajlNev());
+            TorrentComposite tc = TorrentComposite.create(t,bitTorrents,nCoreClient);
+            Assertions.assertNotNull(tc.getId(),t.getFajlNev());
             torrents.add(tc);
         });
 
         bitTorrents.stream()
                 .filter(t ->
                         torrents.stream()
-                        .filter(tc -> tc.getBitTorrent().getId().equals(t.getId()))
+                        .filter(tc -> tc.getId().equals(t.getId()))
                         .findAny()
                         .isEmpty())
                 .forEach(bt ->{
-                    TorrentComposite tc = new TorrentComposite(new Torrent(bt.getNev()),bt);
+                    TorrentComposite tc = new TorrentComposite(new Torrent(bt.getNev()),bt, null);
                     torrents.add(tc);
                 });
         Assertions.assertEquals(bitTorrents.size(),torrents.size());

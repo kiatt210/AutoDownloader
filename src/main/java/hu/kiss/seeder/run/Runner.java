@@ -5,10 +5,7 @@
  */
 package hu.kiss.seeder.run;
 
-import hu.kiss.seeder.action.Action;
-import hu.kiss.seeder.action.RSSDownloadAddTagAction;
-import hu.kiss.seeder.action.StopPauseAction;
-import hu.kiss.seeder.action.WarnedAction;
+import hu.kiss.seeder.action.*;
 import hu.kiss.seeder.auth.Secret;
 import hu.kiss.seeder.client.IMDBClient;
 import hu.kiss.seeder.client.NCoreClient;
@@ -36,8 +33,6 @@ import java.util.concurrent.Executors;
  */
 public class Runner {
 
-    public static final int MAX_ADDABLE_PER_USER = 18;
-    private static int limit = 35;
     private static int MY_MOVIES_COUNT = 6;
     private static final String MY_MOVIES_CATEGORY="Filmek Atinak";
     private NCoreClient ncClientKiatt;
@@ -103,18 +98,6 @@ public class Runner {
 
         callActions();
 
-        if (bitTorrentClient.getIsUpdatable() && bitTorrentClient.getRunningSize() < limit) {
-
-            int addable = MAX_ADDABLE_PER_USER - bitTorrentClient.getRunningSize();
-            addable = Math.max(addable,0);
-            logger.info("Addable: " + addable);
-            int maxAddable = addable == 0 ? 0 : addable / 2;
-            logger.info("Max addable: " + maxAddable);
-            addDownloads(ncClientKiatt, bitTorrentClient);
-            addDownloads(ncClientDake, bitTorrentClient);
-
-        }
-
         refreshMyMovies();
 
         logData(bitTorrentClient);
@@ -158,13 +141,13 @@ public class Runner {
 
             ncClientKiatt.getHrTorrents().stream().forEach(t -> {
                 executor.submit(() -> {
-                    torrents.add(TorrentComposite.create(t, bitTorrentClient.getSeededTorrents()));
+                    torrents.add(TorrentComposite.create(t, bitTorrentClient.getSeededTorrents(),ncClientKiatt));
                 });
             });
 
             ncClientDake.getHrTorrents().stream().forEach(t -> {
                 executor.submit(() -> {
-                    torrents.add(TorrentComposite.create(t, bitTorrentClient.getSeededTorrents()));
+                    torrents.add(TorrentComposite.create(t, bitTorrentClient.getSeededTorrents(),ncClientDake));
                 });
             });
 
@@ -178,7 +161,7 @@ public class Runner {
                                 .findAny()
                                 .isEmpty())
                 .forEach(bt -> {
-                    TorrentComposite tc = new TorrentComposite(new Torrent(bt.getNev()), bt);
+                    TorrentComposite tc = new TorrentComposite(null, bt, null);
                     torrents.add(tc);
                 });
 
@@ -186,18 +169,10 @@ public class Runner {
 
     private void initActions(){
         actions = new ArrayList<Action>();
-
-        Action stopPauseAction = new StopPauseAction();
-        stopPauseAction.init(bitTorrentClient);
-        actions.add(stopPauseAction);
-
-        Action addTagAction = new RSSDownloadAddTagAction();
-        addTagAction.init(bitTorrentClient);
-        actions.add(addTagAction);
-
-        Action warnAction = new WarnedAction();
-        warnAction.init(bitTorrentClient);
-        actions.add(warnAction);
+        actions.add(new StopPauseAction(bitTorrentClient));
+        actions.add(new RSSDownloadAddTagAction(bitTorrentClient));
+        actions.add(new WarnedAction(bitTorrentClient));
+        actions.add(new DownloadAction(bitTorrentClient));
     }
 
     private void callActions() {

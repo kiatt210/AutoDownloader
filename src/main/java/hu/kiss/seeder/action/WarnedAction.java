@@ -17,10 +17,14 @@ public class WarnedAction extends BaseAction{
 
     private static Logger logger = LogManager.getLogger();
 
+    public WarnedAction(QbitorrentClient qClient) {
+        super(qClient);
+    }
+
     @Override
     public void execute(TorrentComposite torrent) {
-        logger.debug("Start handle: nev - " + torrent.getNev()+" status - "+torrent.getBitTorrent().getStatus()+" id - "+torrent.getId());
-        if(torrent.getBitTorrent().getStatus().equals(Status.QUEUED)){
+        logger.debug("Start handle: nev - " + torrent.getNev()+" status - "+torrent.getStatus()+" id - "+torrent.getId());
+        if(torrent.getStatus().equals(Status.QUEUED)){
             if( torrent.getNcoreTorrent().getId() != 0 && torrent.getNcoreTorrent().isWarn()){
                 logger.info(formatLog("Set super seed",torrent));
                 qClient.superSeed(torrent.getId());
