@@ -59,11 +59,19 @@ public class TorrentComposite {
         return "";
     }
 
-    public Status getStatus() {
+    public Status getBitStatus() {
         if(bitTorrent != null){
             return bitTorrent.getStatus();
         }
         return Status.NOT_EXIST;
+    }
+
+    public String getNcoreStatus(){
+        if(ncoreTorrent != null){
+            return ncoreTorrent.getStatus();
+        }
+
+        return null;
     }
 
     public String download() {

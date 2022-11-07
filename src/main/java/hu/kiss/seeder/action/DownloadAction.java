@@ -24,7 +24,7 @@ public class DownloadAction extends BaseAction{
 
     @Override
     public void execute(TorrentComposite torrent) {
-        logger.debug("Start handle: nev - " + torrent.getNev()+" status - "+torrent.getStatus()+" id - "+torrent.getId());
+        logger.debug("Start handle: nev - " + torrent.getNev()+" status - "+torrent.getBitStatus()+" id - "+torrent.getId());
         if(torrent.getNcoreTorrent() != null && torrent.getId().isEmpty()){
 
             if (qClient.getIsUpdatable() && qClient.getRunningSize() < limit) {

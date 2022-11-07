@@ -1,14 +1,10 @@
 package hu.kiss.seeder.action;
 
-import hu.kiss.seeder.client.NCoreClient;
 import hu.kiss.seeder.client.QbitorrentClient;
-import hu.kiss.seeder.data.BitTorrent;
 import hu.kiss.seeder.data.Status;
-import hu.kiss.seeder.data.Torrent;
 import hu.kiss.seeder.data.TorrentComposite;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,26 +21,26 @@ public class StopPauseAction extends BaseAction{
 
     @Override
     public void execute(TorrentComposite torrent) {
-        logger.debug("Start handle: nev - " + torrent.getNev()+" status - "+torrent.getStatus()+" id - "+torrent.getId());
+        logger.debug("Start handle: nev - " + torrent.getNev()+" status - "+torrent.getBitStatus()+" id - "+torrent.getId());
 
-        if(deletableStatuses.contains(torrent.getStatus()) || torrent.getStatus().equals(Status.PAUSED)){
+        if(deletableStatuses.contains(torrent.getBitStatus()) || torrent.getBitStatus().equals(Status.PAUSED)){
 
-            if (deletableStatuses.contains(torrent.getStatus())
+            if (deletableStatuses.contains(torrent.getBitStatus())
                     && !qClient.getTartosIds().contains(torrent.getId())
-                    && torrent.getNcoreTorrent().getStatus() == null
+                    && torrent.getNcoreStatus() == null
             ) {
                 logger.info(formatLog("Remove",torrent));
                 qClient.removeTorrent(torrent.getId());
             }
-            else if(!torrent.getStatus().equals(Status.PAUSED)
-                    && deletableStatuses.contains(torrent.getStatus())
-                    && torrent.getNcoreTorrent().getStatus() == null
+            else if(!torrent.getBitStatus().equals(Status.PAUSED)
+                    && deletableStatuses.contains(torrent.getBitStatus())
+                    && torrent.getNcoreStatus() == null
             ){
                 logger.info(formatLog("Stop",torrent));
                 qClient.pauseTorrent(torrent.getId());
             }
-            else if(torrent.getStatus().equals(Status.PAUSED)
-                    && torrent.getNcoreTorrent().getStatus() != null ){
+            else if(torrent.getBitStatus().equals(Status.PAUSED) &&
+                    torrent.getNcoreStatus() != null ){
                 logger.info(formatLog("Resume",torrent));
                 qClient.resumeTorrent(torrent.getId());
             }
