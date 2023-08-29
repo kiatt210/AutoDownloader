@@ -1,4 +1,4 @@
-FROM eclipse-temurin:19_36-jdk
+FROM eclipse-temurin:19.0.2_7-jdk
 ENV TZ="Europe/Budapest"
 RUN mkdir -p /home/seeder/torrents/
 WORKDIR /home/seeder/
