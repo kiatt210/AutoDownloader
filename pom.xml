@@ -8,68 +8,19 @@
     <artifactId>AutoDownloader</artifactId>
     <version>1.0-SNAPSHOT</version>
     <properties>
-        <junit.version>5.9.0</junit.version>
+      <junit.version>5.9.0</junit.version>
     </properties>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+		<version>3.12.1</version>
                 <configuration>
-                    <compilerArgs>--enable-preview</compilerArgs>
-                    <source>19</source>
-                    <target>19</target>
+                  <source>19</source>
+                  <target>19</target>
                 </configuration>
             </plugin>
-            <!--<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.1.1</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>hu.kiss.seeder.run.Runner</mainClass>
-                        </manifest>
-                        <manifestFile>src\main\resources\manifest.mf</manifestFile>
-                    </archive>
-                    <finalName>AutoDownloader</finalName>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id> &lt;!&ndash; this is used for inheritance merges &ndash;&gt;
-                        <phase>package</phase> &lt;!&ndash; bind to the packaging phase &ndash;&gt;
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>-->
-            <!--<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>
-                                ${project.build.directory}/libs
-                            </outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
-            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -113,18 +64,6 @@
         </plugins>
     </build>
 
-    <!--    <repositories>-->
-    <!--        <repository>-->
-    <!--            <id>central</id>-->
-    <!--            <name>central</name>-->
-    <!--            <url>https://repo1.maven.org/maven2/</url>-->
-    <!--        </repository>-->
-    <!--        <repository>-->
-    <!--            <id>jcenter</id>-->
-    <!--            <name>jcenter</name>-->
-    <!--            <url>https://jcenter.bintray.com/</url>-->
-    <!--        </repository>-->
-    <!--    </repositories>-->
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>

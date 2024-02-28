@@ -214,11 +214,21 @@ public class Runner {
     }
 
     private void sendMqttStart(){
-        pahoClient.send("home/state/auto-downloader","on");
+	try{
+	    pahoClient.send("home/state/auto-downloader","on");
+	}
+	catch (Exception e) {
+		logger.error("MQTT send message error:",e);
+	}
     }
 
     private void sendMqttStop(){
-        pahoClient.send("home/state/auto-downloader","off");
+	try{
+	    pahoClient.send("home/state/auto-downloader","off");
+        }
+	catch (Exception e) {
+		logger.error("MQTT send message error:",e);
+	}
     }
 
     private void refreshMyMovies(){
@@ -230,7 +240,7 @@ public class Runner {
         parameters.put("category","Filmek Atinak");
         parameters.put("tags","tartós");
 
-        while (currentMoviesCount < MY_MOVIES_COUNT) {
+        while (currentMoviesCount > 0 && currentMoviesCount < MY_MOVIES_COUNT) {
             IMDBClient imdbClient = new IMDBClient();
             Collection<String> movies = imdbClient.getRandom(MY_MOVIES_COUNT-currentMoviesCount);
             //Add new torrents
