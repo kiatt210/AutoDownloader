@@ -18,7 +18,7 @@ public class WarnedAction extends BaseAction{
     public void execute(TorrentComposite torrent) {
         logger.debug("Start handle: nev - " + torrent.getNev()+" status - "+torrent.getBitStatus()+" id - "+torrent.getId());
         if(torrent.getBitStatus().equals(Status.QUEUED)){
-            if( torrent.getNcoreTorrent().getId() != 0 && torrent.getNcoreTorrent().isWarn()){
+            if( torrent.getNcoreTorrent() != null && torrent.getNcoreTorrent().getId() != 0 && torrent.getNcoreTorrent().isWarn()){
                 logger.info(formatLog("Set super seed",torrent));
                 qClient.superSeed(torrent.getId());
                 qClient.forceStart(torrent.getId());

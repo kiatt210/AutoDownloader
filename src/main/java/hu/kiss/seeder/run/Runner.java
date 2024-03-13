@@ -101,7 +101,7 @@ public class Runner {
         refreshMyMovies();
 
         logData(bitTorrentClient);
-
+	
         ncClientKiatt.logout();
         ncClientDake.logout();
         sendMqttStop();
@@ -110,18 +110,21 @@ public class Runner {
     private void init() throws IOException, InterruptedException {
         pahoClient = new PahoClient();
         sendMqttStart();
-        ncClientKiatt = new NCoreClient();
+
+	ncClientKiatt = new NCoreClient();
+	ncClientKiatt.login(Secret.all().get(0));
+
         ncClientDake = new NCoreClient();
-        bitTorrentClient = new QbitorrentClient();
+        ncClientDake.login(Secret.all().get(1));
+
+	bitTorrentClient = new QbitorrentClient();
         try(var executor = Executors.newVirtualThreadPerTaskExecutor()){
             executor.execute(()-> {
-                        ncClientKiatt.login(Secret.all().get(0));
                         //Ki gyűjtkük az ncore-ban lévő torrenteket
                         ncClientKiatt.populateHrTorrents();
                     }
             );
             executor.execute(() ->{
-                    ncClientDake.login(Secret.all().get(1));
                     //Ki gyűjtkük az ncore-ban lévő torrenteket
                     ncClientDake.populateHrTorrents();
                     }
@@ -240,12 +243,14 @@ public class Runner {
         parameters.put("category","Filmek Atinak");
         parameters.put("tags","tartós");
 
-        while (currentMoviesCount > 0 && currentMoviesCount < MY_MOVIES_COUNT) {
+	Boolean isValidResponse = true;
+        while (currentMoviesCount > 0 && currentMoviesCount < MY_MOVIES_COUNT && isValidResponse) {
             IMDBClient imdbClient = new IMDBClient();
             Collection<String> movies = imdbClient.getRandom(MY_MOVIES_COUNT-currentMoviesCount);
             //Add new torrents
             for (String movie : movies) {
                 List<Torrent> t = ncClientKiatt.searchByImd(movie);
+		isValidResponse = !t.isEmpty();
                 Optional<Torrent> torrent = ncClientKiatt.getBest(t);
                 if(torrent.isPresent()){
                     String fileName = ncClientKiatt.download(torrent.get());

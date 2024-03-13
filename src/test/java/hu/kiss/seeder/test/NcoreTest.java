@@ -51,7 +51,7 @@ public class NcoreTest {
     @Test
     public void testSearch(){
         List<Torrent> torrents = ncClient.search("The Birds 1963");
-        Assert.assertEquals(7,torrents.size());
+        Assert.assertEquals(8,torrents.size());
 
         Optional<Torrent> best = ncClient.getBest(torrents);
         Assert.assertEquals("The.Birds.1963.720p.BluRay.DTS.x264.Hun-HDGirL",best.get().getTorrentNev());
@@ -61,7 +61,7 @@ public class NcoreTest {
     @Test
     public void testSearchByImdb(){
         List<Torrent> torrents = ncClient.searchByImd("tt0111161");
-        Assert.assertEquals(22,torrents.size());
+        Assert.assertEquals(21,torrents.size());
 
         Optional<Torrent> best = ncClient.getBest(torrents);
         Assert.assertEquals("The.Shawshank.Redemption.1994.REMASTERED.720p.BluRay.x264-CiNEPHiLiA",best.get().getTorrentNev());

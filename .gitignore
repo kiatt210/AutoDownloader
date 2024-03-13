@@ -1,4 +1,7 @@
 .idea/**
 target/**
+.settings/**
+.classpath
+.lck
 AutoDownloader.iml
 /src/main/resources/secrets.json

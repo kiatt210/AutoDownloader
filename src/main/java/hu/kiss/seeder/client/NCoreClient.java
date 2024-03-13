@@ -67,10 +67,10 @@ public class NCoreClient {
     private void doLogin(String password) throws UnsupportedEncodingException, IOException {
 
         HashMap params = new HashMap<String, String>();
-        params.put("nev", userName);
-        params.put("pass", password);
         params.put("set_lang", "hu");
         params.put("submitted", "1");
+        params.put("nev", userName);
+        params.put("pass", password);
 
         HttpResponse response = httpUtils.doPost(LOGIN_URL, params);
         logger.debug(httpUtils.getContent(response));
@@ -85,7 +85,8 @@ public class NCoreClient {
         //get all headers
         Header[] headers = response.getAllHeaders();
         for (Header header : headers) {
-            if (header.getName().equals("Set-Cookie") && header.getValue().startsWith("PHPSESSID=")) {
+	if (header.getName().equals("Set-Cookie") && header.getValue().startsWith("PHPSESSID=")) {
+		logger.info("Cookie:"+header.getValue());
                 phpSessionId = header.getValue().split("PHPSESSID=")[1].replace("; path=/", "");
                 logger.debug("PHPSESSID=" + phpSessionId);
             }
@@ -239,7 +240,7 @@ public class NCoreClient {
         params.put("mire",query);
         params.put("miben","name");
         params.put("tipus","all_own");
-        HttpResponse response = httpUtils.doPost(BASE_URL+"torrents.php",params);
+        HttpResponse response = httpUtils.doPost(BASE_URL+"torrents.php",params,getDefaultHeader());
 
         String content = httpUtils.getContent(response);
 
@@ -265,15 +266,17 @@ public class NCoreClient {
     public List<Torrent> searchByImd(String imdbId){
         logger.info("Search by query:"+imdbId);
         Map<String,String> params = new HashMap<>();
-        params.put("nyit_filmek_resz","true");
-        params.put("nyit_sorozat_resz","true");
         params.put("mire",imdbId);
         params.put("miben","imdb");
         params.put("tipus","all_own");
-        HttpResponse response = httpUtils.doPost(BASE_URL+"torrents.php",params);
+	params.put("submit.x","48");
+	params.put("submit.y","8");
+	params.put("tags","");
 
+        HttpResponse response = httpUtils.doPost(BASE_URL+"torrents.php",params,getDefaultHeader());
+	logger.info(response.getStatusLine());
         String content = httpUtils.getContent(response);
-
+	
         Document doc = Jsoup.parseBodyFragment(content);
         Elements torrentBoxes = doc.select(".box_torrent");
         logger.info("Torrent size:"+torrentBoxes.size());

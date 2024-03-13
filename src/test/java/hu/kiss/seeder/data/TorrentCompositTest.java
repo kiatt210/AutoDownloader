@@ -49,6 +49,7 @@ public class TorrentCompositTest {
                         .isEmpty())
                 .forEach(bt ->{
                     TorrentComposite tc = new TorrentComposite(new Torrent(bt.getNev()),bt, null);
+                    Assertions.assertNotNull(tc.getNcoreTorrent(),bt.getNev());
                     torrents.add(tc);
                 });
         Assertions.assertEquals(bitTorrents.size(),torrents.size());

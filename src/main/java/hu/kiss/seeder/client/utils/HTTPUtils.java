@@ -44,12 +44,17 @@ public class HTTPUtils {
         this.client = httpClientBuilder.build();
     }
 
-    public HttpResponse doPost(String url,Map<String,String> parameters){
+	public HttpResponse doPost(String url, Map<String, String> parameters) {
+		return doPost(url, parameters, Map.of());
+	}
+    public HttpResponse doPost(String url,Map<String,String> parameters, Map<String, String> headers){
         HttpPost post = new HttpPost(url);
         ArrayList<NameValuePair> postParameters = new ArrayList<>();
         parameters.forEach((key, value) -> {
             postParameters.add(new BasicNameValuePair(key, value));
         });
+
+	headers.entrySet().forEach(e -> post.addHeader(e.getKey(), e.getValue()));
 
         try {
             post.setEntity(new UrlEncodedFormEntity(postParameters, "UTF-8"));
@@ -98,6 +103,7 @@ public class HTTPUtils {
             logger.debug("Start get url=" + url);
             HttpGet get = new HttpGet(url);
             logger.debug("Populate headers");
+
             if(headers != null){
                 headers.forEach((key, value) -> get.setHeader(key, value));
             }
