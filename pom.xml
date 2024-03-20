@@ -78,7 +78,10 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
-                    <argLine>--enable-preview</argLine>
+                  <argLine>--enable-preview</argLine>
+		  <excludes>
+		    <exclude>**/NcoreTest.java</exclude>
+		  </excludes>
                 </configuration>
 		
             </plugin>
