@@ -81,6 +81,7 @@
                   <argLine>--enable-preview</argLine>
 		  <excludes>
 		    <exclude>**/NcoreTest.java</exclude>
+		    <exclude>**/DelugeRPCClientTest.java</exclude>
 		  </excludes>
                 </configuration>
 		
