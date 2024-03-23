@@ -83,7 +83,6 @@
 		    <exclude>**/NcoreTest.java</exclude>
 		    <exclude>**/DelugeRPCClientTest.java</exclude>
 		    <exclude>**/PahoClientTest.java</exclude>
-		    <exclude>**/HTTPCUtilsTest.java</exclude>
 		  </excludes>
                 </configuration>
 		
