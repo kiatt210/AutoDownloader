@@ -11,12 +11,12 @@ public class SecretTest {
     public void testAll(){
         Collection secrets =  Secret.all();
         Assertions.assertFalse(secrets.isEmpty());
-        Assertions.assertEquals(2,secrets.size());
+        Assertions.assertEquals(1,secrets.size());
 
-        Secret kiatt = Secret.get("kiatt07");
-        Assertions.assertFalse(kiatt.getUsername().isEmpty());
-        Assertions.assertFalse(kiatt.getPassword().isEmpty());
-        Assertions.assertFalse(kiatt.getKey().isEmpty());
+        Secret test = Secret.get("test");
+        Assertions.assertFalse(test.getUsername().isEmpty());
+        Assertions.assertFalse(test.getPassword().isEmpty());
+        Assertions.assertFalse(test.getKey().isEmpty());
     }
 
 }
