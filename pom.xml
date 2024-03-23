@@ -85,7 +85,6 @@
 		    <exclude>**/PahoClientTest.java</exclude>
 		    <exclude>**/NcoreLoginTest.java</exclude>
 		    <exclude>**/HTTPCUtilsTest.java</exclude>
-		    <exclude>**/TorrentCompositTest.java</exclude>
 		    <exclude>**/SecretTest.java</exclude>
 		  </excludes>
                 </configuration>
