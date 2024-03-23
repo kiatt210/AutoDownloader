@@ -1,59 +1,58 @@
 package hu.kiss.seeder.data;
 
-import hu.kiss.seeder.auth.Secret;
-import hu.kiss.seeder.client.NCoreClient;
-import hu.kiss.seeder.client.QbitorrentClient;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import hu.kiss.seeder.client.NCoreClient;
+import hu.kiss.seeder.client.QbitorrentClient;
 
 public class TorrentCompositTest {
 
-    private NCoreClient nCoreClient;
+	private NCoreClient nCoreClient;
+	private QbitorrentClient qbitorrentClient; 
 
-    @AfterEach
-    public void cleanUp(){
-        nCoreClient.logout();
-    }
+	@BeforeEach
+	public void cleanUp() {
+		nCoreClient = mock(NCoreClient.class);
+		when(nCoreClient.getHrTorrents()).thenReturn(List.of(new Torrent("Test")));
 
-    @Test
-    public void testPairing(){
-        NCoreClient.DOWNLOAD_LOCATION = "target/";
-        nCoreClient = new NCoreClient();
-        nCoreClient.login(Secret.all().get(0));
-        nCoreClient.populateHrTorrents();
+		qbitorrentClient = mock(QbitorrentClient.class);
+		when(qbitorrentClient.getSeededTorrents()).thenReturn(List.of(new BitTorrent("Name: Test\nID: 1\n State: Seeding")));
+	}
 
-        var ncoreTorrents = nCoreClient.getHrTorrents();
+	@Test
+	public void testPairing() {
 
-        QbitorrentClient qbitorrentClient = new QbitorrentClient();
-        qbitorrentClient.populateSeededTorrents();
-        var bitTorrents = qbitorrentClient.getSeededTorrents();
-        Assertions.assertTrue(bitTorrents.stream().filter(bt -> bt.getId() == null).findAny().isEmpty());
+		var ncoreTorrents = nCoreClient.getHrTorrents();
 
-        List<TorrentComposite> torrents = new ArrayList<>();
-        ncoreTorrents.stream().forEach( t ->{
-            TorrentComposite tc = TorrentComposite.create(t,bitTorrents,nCoreClient);
-            Assertions.assertNotNull(tc.getId(),t.getFajlNev());
-            torrents.add(tc);
-        });
+		var bitTorrents = qbitorrentClient.getSeededTorrents();
+		Assertions.assertTrue(bitTorrents.stream().filter(bt -> bt.getId() == null).findAny().isEmpty());
 
-        bitTorrents.stream()
-                .filter(t ->
-                        torrents.stream()
-                        .filter(tc -> tc.getId().equals(t.getId()))
-                        .findAny()
-                        .isEmpty())
-                .forEach(bt ->{
-                    TorrentComposite tc = new TorrentComposite(new Torrent(bt.getNev()),bt, null);
-                    Assertions.assertNotNull(tc.getNcoreTorrent(),bt.getNev());
-                    torrents.add(tc);
-                });
-        Assertions.assertEquals(bitTorrents.size(),torrents.size());
-    }
+		List<TorrentComposite> torrents = new ArrayList<>();
+		ncoreTorrents.stream().forEach(t -> {
+			TorrentComposite tc = TorrentComposite.create(t, bitTorrents, nCoreClient);
+			Assertions.assertNotNull(tc.getId(), t.getFajlNev());
+			torrents.add(tc);
+		});
 
+		bitTorrents.stream()
+				.filter(t -> torrents.stream()
+						.filter(tc -> tc.getId().equals(t.getId()))
+						.findAny()
+						.isEmpty())
+				.forEach(bt -> {
+					TorrentComposite tc = new TorrentComposite(new Torrent(bt.getNev()), bt, null);
+					Assertions.assertNotNull(tc.getNcoreTorrent(), bt.getNev());
+					torrents.add(tc);
+				});
+		Assertions.assertEquals(bitTorrents.size(), torrents.size());
+	}
 
 }
