@@ -7,6 +7,7 @@ package hu.kiss.seeder.run;
 
 import hu.kiss.seeder.action.*;
 import hu.kiss.seeder.auth.Secret;
+import hu.kiss.seeder.client.EmbyClient;
 import hu.kiss.seeder.client.IMDBClient;
 import hu.kiss.seeder.client.NCoreClient;
 import hu.kiss.seeder.client.QbitorrentClient;
@@ -39,6 +40,7 @@ public class Runner {
     private NCoreClient ncClientDake;
     private QbitorrentClient bitTorrentClient;
     private PahoClient pahoClient;
+    private EmbyClient embyClient;
 
     private PahoClient client;
     private List<Action> actions;
@@ -109,6 +111,7 @@ public class Runner {
 
     private void init() throws IOException, InterruptedException {
         pahoClient = new PahoClient();
+	embyClient = new EmbyClient(System.getenv("EMBY_LIBRARY"));
         sendMqttStart();
 
 	ncClientKiatt = new NCoreClient();
@@ -172,6 +175,7 @@ public class Runner {
 
     private void initActions(){
         actions = new ArrayList<Action>();
+	actions.add(new DeleteEpisodeAction(bitTorrentClient, embyClient));
         actions.add(new StopPauseAction(bitTorrentClient));
         actions.add(new RSSDownloadAddTagAction(bitTorrentClient));
         actions.add(new WarnedAction(bitTorrentClient));
