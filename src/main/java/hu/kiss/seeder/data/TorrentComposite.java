@@ -77,4 +77,8 @@ public class TorrentComposite {
     public String download() {
         return nCoreClient.download(ncoreTorrent);
     }
+
+    public List<String> getTags() {
+	return bitTorrent.getTags();
+    }
 }

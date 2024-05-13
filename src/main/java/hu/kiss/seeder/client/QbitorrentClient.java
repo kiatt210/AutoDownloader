@@ -76,6 +76,9 @@ public class QbitorrentClient implements TorrentClientI {
 						torrent.setAdditionDate(LocalDateTime.ofInstant(Instant.ofEpochSecond(t.getAdded_on()),
 								ZoneId.systemDefault()));
 						torrent.setCategory(t.getCategory());
+						torrent.setPath(t.getSave_path());
+						torrent.setTags(t.getTags());
+						
 						switch (t.getState()) {
 							case "uploading":
 							case "stalledUP":
@@ -229,12 +232,13 @@ public class QbitorrentClient implements TorrentClientI {
 
 	public List<String> getFiles(String id) {
 		logger.debug("Id:"+id);
+		var torrent = this.seededTorrents.stream().filter(t -> t.getId().equals(id)).findFirst().get();
 		List<FileInfo> result = HTTPUtils.getRequest(urlString + "/api/v2/torrents/files?hash=" + id, sessionId,new TypeReference<List<FileInfo>>() {
 				}, true);
 		if (result == null) {
 		    return List.of();
 		}
-		return result.stream().map(FileInfo::getName).collect(Collectors.toList());
+		return result.stream().map(i -> torrent.getPath()+"/"+i.getName()).collect(Collectors.toList());
 
 	}
 

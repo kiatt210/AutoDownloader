@@ -1,6 +1,7 @@
 FROM eclipse-temurin:19.0.2_7-jdk
 ENV TZ="Europe/Budapest"
-ENV EMBY_LIBRARY="/emby/library.db"
+ENV API_KEY="<EMBY_API_KEY>"
+ENV USER_ID="<EMBY_USER_ID>"
 RUN mkdir -p /home/seeder/torrents/
 WORKDIR /home/seeder/
 

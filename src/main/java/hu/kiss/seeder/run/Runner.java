@@ -13,6 +13,7 @@ import hu.kiss.seeder.client.NCoreClient;
 import hu.kiss.seeder.client.QbitorrentClient;
 import hu.kiss.seeder.client.TorrentClientI;
 import hu.kiss.seeder.client.mqtt.PahoClient;
+import hu.kiss.seeder.client.utils.HTTPUtils;
 import hu.kiss.seeder.data.BitTorrent;
 import hu.kiss.seeder.data.Torrent;
 import hu.kiss.seeder.data.TorrentComposite;
@@ -111,7 +112,7 @@ public class Runner {
 
     private void init() throws IOException, InterruptedException {
         pahoClient = new PahoClient();
-	embyClient = new EmbyClient(System.getenv("EMBY_LIBRARY"));
+	embyClient = new EmbyClient(new HTTPUtils());
         sendMqttStart();
 
 	ncClientKiatt = new NCoreClient();

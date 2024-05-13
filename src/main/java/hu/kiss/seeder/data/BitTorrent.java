@@ -6,6 +6,9 @@
 package hu.kiss.seeder.data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -17,6 +20,9 @@ public class BitTorrent {
     private String id = "";
     private Status status;
     private String category;
+    private String path;
+    private List<String> tags;
+    
     private LocalDateTime additionDate;
 
     public BitTorrent(String info) {
@@ -81,6 +87,22 @@ public class BitTorrent {
         this.category = category;
     }
 
+    public String getPath() {
+	return path;
+    }
+
+    public void setPath(String path) {
+	this.path = path;
+    }
+
+    public List<String> getTags() {
+	return this.tags;
+    }
+
+    public void setTags(String tags) {
+	this.tags = Arrays.asList(tags.split(","));
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof BitTorrent) {
@@ -96,5 +118,6 @@ public class BitTorrent {
     public String toString() {
         return "DelugeTorrent[nev=" + nev + ",id=" + id + ",status=" + status + "]";
     }
+
 
 }

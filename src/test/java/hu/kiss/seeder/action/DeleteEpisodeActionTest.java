@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import hu.kiss.seeder.client.EmbyClient;
 import hu.kiss.seeder.client.QbitorrentClient;
@@ -35,6 +34,7 @@ public class DeleteEpisodeActionTest {
 		TorrentComposite t = mock(TorrentComposite.class);
 		when(t.getCategory()).thenReturn("Álommeló");
 		when(t.getId()).thenReturn("watched");
+		when(t.getTags()).thenReturn(List.of("tartós"));
 		action.execute(t);
 		verify(qClient).removeTag(eq("watched"), any());
 	}
@@ -45,6 +45,7 @@ public class DeleteEpisodeActionTest {
 		TorrentComposite t = mock(TorrentComposite.class);
 		when(t.getCategory()).thenReturn("Álommeló");
 		when(t.getId()).thenReturn("unwatched");
+		when(t.getTags()).thenReturn(List.of("tartós"));
 		action.execute(t);
 		verify(qClient,atLeast(0)).removeTag(eq("unwatched"), any());
 	}

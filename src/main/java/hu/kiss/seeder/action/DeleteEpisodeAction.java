@@ -16,7 +16,7 @@ public class DeleteEpisodeAction extends BaseAction {
 	private EmbyClient embyClient;
 	private final String TAG = "tartós";
 	private static final List<String> VIDEO_EXTENSIONS = List.of("mkv", "mp4", "avi", "wmv");
-	private static final List<String> CATEGORIES = List.of("Álommeló");
+	private static final List<String> CATEGORIES = List.of("Álommeló","Capak kozott");
 
 	public DeleteEpisodeAction(QbitorrentClient qClient, EmbyClient embyClient) {
 		super(qClient);
@@ -27,15 +27,17 @@ public class DeleteEpisodeAction extends BaseAction {
 	@Override
 	public void execute(TorrentComposite torrent) {
 		logger.debug("Start handle: nev - " + torrent.getNev() + " status - " + torrent.getBitStatus() + " id - "+ torrent.getId());
-		if (CATEGORIES.contains(torrent.getCategory())) {
+		if (CATEGORIES.contains(torrent.getCategory()) && torrent.getTags().contains(TAG)) {
 			Boolean allWatched = true;
 			for (String episode : qClient.getFiles(torrent.getId())) {
-				logger.debug("Check "+episode);
+
 				var extension = episode.split("\\.")[episode.split("\\.").length-1];
-				if (VIDEO_EXTENSIONS.contains(extension) && !embyClient.isWatched(episode)) {
+;
+				if (VIDEO_EXTENSIONS.contains(extension) && !episode.endsWith("sample."+extension) && !embyClient.isWatched(episode.replace("downloads", "mnt/share1"))) {
 					allWatched = false;
 				}
 			}
+
 			if (allWatched) {
 				logger.info("Remove tartos tag from" + torrent.getNev());
 				qClient.removeTag(torrent.getId(), TAG);
