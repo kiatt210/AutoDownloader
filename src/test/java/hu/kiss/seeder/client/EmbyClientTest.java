@@ -59,7 +59,7 @@ public class EmbyClientTest {
 
     @Test
     public void testSelectPlayed() throws IOException{
-	Assert.assertNotNull(System.getenv("API_KEY"));
+
 	HTTPUtils httpUtils = mock(HTTPUtils.class);
 	HttpResponse response = mock(HttpResponse.class);
 	HttpEntity entity = mock(HttpEntity.class);

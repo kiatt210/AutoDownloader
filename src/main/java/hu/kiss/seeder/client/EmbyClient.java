@@ -20,7 +20,6 @@ import org.json.simple.JSONArray;
 import hu.kiss.seeder.client.utils.HTTPUtils;
 
 public class EmbyClient {
-	//curl -X 'GET'   'http://192.168.0.20:8096/emby/Items?api_key=e6b02179ed994015a2c564f963c60230&Recursive=true&IncludeItemTypes=episode&Path=%2Fmnt%2Fshare1%2FCapak.Kozott%2FSeason.7%2FCapak.kozott.S07E10.720p.RTLP.WEB-DL.AAC2.0.H.264.HUN-FULCRUM%2Ffulcrum-capak.kozott.s07e10.720p.web.mkv&EnableUserData=true&UserId=5242342ffa0548a58a991108687069ef' -H 'accept: application/json'| jq
 
 	private static Logger logger = LogManager.getLogger();
 	private final String REQUEST_PATH="http://192.168.0.20:8096/emby/Items";
