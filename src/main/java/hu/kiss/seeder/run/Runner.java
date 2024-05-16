@@ -111,16 +111,16 @@ public class Runner {
     }
 
     private void init() throws IOException, InterruptedException {
-	System.out.println(Secret.all("/home/seeder/secrets.json").get(0));
+
 	pahoClient = new PahoClient();
 	embyClient = new EmbyClient(new HTTPUtils());
         sendMqttStart();
 	
 	ncClientKiatt = new NCoreClient();
-	ncClientKiatt.login(Secret.all("/home/seeder/secrets.json").get(0));
+	ncClientKiatt.login(Secret.all().get(0));
 
         ncClientDake = new NCoreClient();
-        ncClientDake.login(Secret.all("/home/seeder/secrets.json").get(1));
+        ncClientDake.login(Secret.all().get(1));
 
 	bitTorrentClient = new QbitorrentClient();
         try(var executor = Executors.newVirtualThreadPerTaskExecutor()){

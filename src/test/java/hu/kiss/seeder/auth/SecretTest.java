@@ -10,8 +10,8 @@ public class SecretTest {
 
     @Test
     public void testAll(){
-	var file = this.getClass().getClassLoader().getResource("secrets.json").getFile();
-        Collection secrets =  Secret.all(file);
+
+        Collection secrets =  Secret.all();
         Assertions.assertFalse(secrets.isEmpty());
         Assertions.assertEquals(1,secrets.size());
         Secret test = Secret.get("test");
