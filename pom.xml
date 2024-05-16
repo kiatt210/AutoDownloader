@@ -9,7 +9,7 @@
   </scm>
     <groupId>hu.kiss.seeder</groupId>
     <artifactId>AutoDownloader</artifactId>
-    <version>1.15</version>
+    <version>1.16-SNAPSHOT</version>
     <properties>
              <junit.version>5.10.2</junit.version>
     </properties>
