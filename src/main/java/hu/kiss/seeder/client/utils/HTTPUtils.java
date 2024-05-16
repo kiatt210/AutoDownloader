@@ -35,6 +35,7 @@ public class HTTPUtils {
 
     HttpClient client;
     public HTTPUtils (){
+	try{
         RequestConfig.Builder requestBuilder = RequestConfig.custom();
         requestBuilder.setConnectTimeout(30000);
         requestBuilder.setConnectionRequestTimeout(30000);
@@ -42,6 +43,11 @@ public class HTTPUtils {
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
         httpClientBuilder.setDefaultRequestConfig(requestBuilder.build());
         this.client = httpClientBuilder.build();
+	}
+	catch(SecurityException e){
+	    logger.error("Security exception",e);
+	    System.exit(1);
+	}
     }
 
 	public HttpResponse doPost(String url, Map<String, String> parameters) {
