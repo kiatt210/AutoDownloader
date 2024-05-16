@@ -11,8 +11,8 @@ WORKDIR /home/seeder/
 COPY libs libs
 COPY $JAR_FILE app.jar
 
-RUN ["java", "-XX:ArchiveClassesAtExit=/home/seeder/dynamic-cds.jsa" ,"--enable-preview", "-jar", "/home/seeder/${JAR_FILE}"]
+RUN ["java", "-XX:ArchiveClassesAtExit=/home/seeder/dynamic-cds.jsa" ,"--enable-preview", "-jar", "/home/seeder/app.jar"]
 
-ENTRYPOINT  ["java", "-XX:SharedArchiveFile=dynamic-cds.jsa",  "--enable-preview", "-jar", "/home/seeder/${JAR_FILE}"]
+ENTRYPOINT  ["java", "-XX:SharedArchiveFile=dynamic-cds.jsa",  "--enable-preview", "-jar", "/home/seeder/app.jar"]
 #dokcer build -f Dockerfile --tag kiatt210/testing:auto-downloader --push
 #docker run --name auto-downloader -v /opt/docker/emby/config/data:/emby auto-downloader:1.6
