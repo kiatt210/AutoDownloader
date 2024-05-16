@@ -46,7 +46,7 @@ public class HTTPUtils {
 	}
 	catch(Exception e){
 	    logger.error("Security exception",e);
-	    System.exit(1);
+	    System.exit(0);
 	}
     }
 
