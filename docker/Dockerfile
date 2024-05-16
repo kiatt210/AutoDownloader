@@ -8,7 +8,7 @@ ARG JAR_FILE
 RUN mkdir -p /home/seeder/torrents/
 WORKDIR /home/seeder/
 
-COPY libs libs
+COPY target/libs libs
 COPY $JAR_FILE app.jar
 
 RUN ["java", "-XX:ArchiveClassesAtExit=/home/seeder/dynamic-cds.jsa" ,"--enable-preview", "-jar", "/home/seeder/app.jar"]
