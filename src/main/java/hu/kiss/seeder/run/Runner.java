@@ -75,7 +75,7 @@ public class Runner {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
         logger.info("-----------------------------------------------");
-        logger.info("Start runner");
+        logger.info("Start runner v21");
         logger.info("-----------------------------------------------");
         new Runner().run();
         logger.info("-----------------------------------------------");
