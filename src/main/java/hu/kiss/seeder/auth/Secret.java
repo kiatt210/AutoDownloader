@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -16,6 +17,7 @@ public class Secret {
     private String username;
     private String password;
     private String key;
+    private static String file;
 
     public String getUsername() {
         return username;
@@ -41,13 +43,12 @@ public class Secret {
         this.key = key;
     }
 
-    public static List<Secret> all(){
+    public static List<Secret> all(String file){
+	Secret.file = file;
         ObjectMapper objectMapper = new ObjectMapper();
 
-        ClassLoader classLoader = Secret.class.getClassLoader();
-        InputStream resource = classLoader.getResourceAsStream("secrets.json");
-
         try {
+	    InputStream resource = new FileInputStream(new File(file));
             return objectMapper.readValue(resource, new TypeReference<List<Secret>>() {});
 
         } catch (IOException e) {
@@ -57,6 +58,6 @@ public class Secret {
     }
 
     public static Secret get(String userName){
-        return all().stream().filter( f-> f.username.equals(userName)).findFirst().orElse(new Secret());
+        return all(file).stream().filter( f-> f.username.equals(userName)).findFirst().orElse(new Secret());
     }
 }

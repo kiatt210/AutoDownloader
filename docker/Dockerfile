@@ -8,6 +8,7 @@ ARG JAR_FILE
 RUN mkdir -p /home/seeder/torrents/
 WORKDIR /home/seeder/
 
+COPY ../../src/main/resources/secrets.json secrets.json
 COPY target/libs libs
 COPY $JAR_FILE app.jar
 
