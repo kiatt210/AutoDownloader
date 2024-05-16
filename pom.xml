@@ -5,7 +5,6 @@
       <url>https://github.com/kiatt210/AutoDownloader.git</url>
       <connection>scm:git:https://github.com/kiatt210/AutoDownloader.git</connection>
       <developerConnection>scm:git:https://github.com/kiatt210/AutoDownloader.git</developerConnection>
-      <tag>AutoDownloader-1.0</tag>
     </scm>
     <groupId>hu.kiss.seeder</groupId>
     <artifactId>AutoDownloader</artifactId>
