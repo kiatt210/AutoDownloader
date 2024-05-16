@@ -5,11 +5,11 @@
       <url>https://github.com/kiatt210/AutoDownloader.git</url>
       <connection>scm:git:https://github.com/kiatt210/AutoDownloader.git</connection>
       <developerConnection>scm:git:https://github.com/kiatt210/AutoDownloader.git</developerConnection> 
-    <tag>HEAD</tag>
+    <tag>AutoDownloader-1.12</tag>
   </scm>
     <groupId>hu.kiss.seeder</groupId>
     <artifactId>AutoDownloader</artifactId>
-    <version>1.12-SNAPSHOT</version>
+    <version>1.12</version>
     <properties>
              <junit.version>5.10.2</junit.version>
     </properties>
@@ -46,7 +46,7 @@
 		</execution>
 	      </executions>
 	    </plugin>
-            <plugin>
+<!--            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <configuration>
@@ -59,7 +59,7 @@
                         </manifest>
                     </archive>
                 </configuration>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
