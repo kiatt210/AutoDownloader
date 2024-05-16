@@ -33,9 +33,10 @@ public class NcoreTest {
 
     @BeforeAll
     public static void init(){
+	var file = NcoreTest.class.getClassLoader().getResource("secrets.json").getFile();
         Configurator.setRootLevel(Level.DEBUG);
         ncClient = new NCoreClient();
-        ncClient.login(Secret.all().get(0));
+        ncClient.login(Secret.all(file).get(0));
         NCoreClient.DOWNLOAD_LOCATION = "target/";
     }
     @AfterAll
