@@ -5,11 +5,11 @@
       <url>https://github.com/kiatt210/AutoDownloader.git</url>
       <connection>scm:git:https://github.com/kiatt210/AutoDownloader.git</connection>
       <developerConnection>scm:git:https://github.com/kiatt210/AutoDownloader.git</developerConnection> 
-    <tag>AutoDownloader-1.15</tag>
+    <tag>AutoDownloader-1.17</tag>
   </scm>
     <groupId>hu.kiss.seeder</groupId>
     <artifactId>AutoDownloader</artifactId>
-    <version>1.17-SNAPSHOT</version>
+    <version>1.17</version>
     <properties>
              <junit.version>5.10.2</junit.version>
     </properties>
@@ -64,13 +64,13 @@
 		</executions>
                 <configuration>
 		  <attach>false</attach>
-                    <!--<archive>
+                    <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <mainClass>hu.kiss.seeder.run.Runner</mainClass>
                             <classpathPrefix>libs/</classpathPrefix>
                         </manifest>
-                    </archive>-->
+                    </archive>
                 </configuration>
             </plugin>
             <plugin>
