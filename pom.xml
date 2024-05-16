@@ -4,9 +4,9 @@
     <scm>
       <url>https://github.com/kiatt210/AutoDownloader.git</url>
       <connection>scm:git:https://github.com/kiatt210/AutoDownloader.git</connection>
-      <developerConnection>scm:git:https://github.com/kiatt210/AutoDownloader.git</developerConnection>
+      <developerConnection>scm:git:https://github.com/kiatt210/AutoDownloader.git</developerConnection> 
       <tag>AutoDownloader-1.8</tag>
-    </scm>
+  </scm>
     <groupId>hu.kiss.seeder</groupId>
     <artifactId>AutoDownloader</artifactId>
     <version>1.8</version>
@@ -115,6 +115,10 @@
 		<goals>
 		  package,deploy
 		</goals>
+		<pushChanges>false</pushChanges>
+		    <checkModificationExcludes>
+		      <checkModificationExclude>pom.xml</checkModificationExclude>
+		    </checkModificationExcludes>
 	      </configuration>
 	    </plugin>
 	    <plugin>
