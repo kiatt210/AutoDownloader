@@ -113,7 +113,7 @@
 	      <artifactId>maven-release-plugin</artifactId>
 	      <configuration>
 		<goals>
-		  deploy
+		  pacakge,deploy
 		</goals>
 	      </configuration>
 	    </plugin>
