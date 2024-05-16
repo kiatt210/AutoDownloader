@@ -11,7 +11,7 @@ WORKDIR /home/seeder/
 COPY target/libs libs
 COPY $JAR_FILE app.jar
 
-RUN ["java", "-XX:ArchiveClassesAtExit=/home/seeder/dynamic-cds.jsa" ,"--enable-preview", "-jar", "/home/seeder/app.jar"]
+#RUN ["java", "-XX:ArchiveClassesAtExit=/home/seeder/dynamic-cds.jsa" ,"--enable-preview", "-jar", "/home/seeder/app.jar"]
 
 ENTRYPOINT  ["java", "-XX:SharedArchiveFile=dynamic-cds.jsa",  "--enable-preview", "-jar", "/home/seeder/app.jar"]
 #dokcer build -f Dockerfile --tag kiatt210/testing:auto-downloader --push
