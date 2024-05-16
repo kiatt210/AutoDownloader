@@ -9,7 +9,7 @@
     </scm>
     <groupId>hu.kiss.seeder</groupId>
     <artifactId>AutoDownloader</artifactId>
-    <version>1.9-SNAPSHOT</version>
+    <version>1.8-SNAPSHOT</version>
     <properties>
              <junit.version>5.10.2</junit.version>
     </properties>
@@ -48,7 +48,7 @@
 	    </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
+                <artifactId>maven-source-plugin</artifactId>
                 <configuration>
                     <archive>
                         <manifest>
