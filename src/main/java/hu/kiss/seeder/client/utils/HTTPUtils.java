@@ -44,7 +44,7 @@ public class HTTPUtils {
         httpClientBuilder.setDefaultRequestConfig(requestBuilder.build());
         this.client = httpClientBuilder.build();
 	}
-	catch(SecurityException e){
+	catch(Exception e){
 	    logger.error("Security exception",e);
 	    System.exit(1);
 	}
