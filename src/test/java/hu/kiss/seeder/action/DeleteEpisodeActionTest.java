@@ -10,12 +10,14 @@ import org.junit.jupiter.api.Test;
 
 import hu.kiss.seeder.client.EmbyClient;
 import hu.kiss.seeder.client.QbitorrentClient;
+import hu.kiss.seeder.config.ConfigStore;
 import hu.kiss.seeder.data.TorrentComposite;
 
 public class DeleteEpisodeActionTest {
 
 	private static EmbyClient embyClient;
 	private static QbitorrentClient qClient;
+	private static ConfigStore configStore;
 
 	@BeforeAll
 	public static void setup() {
@@ -26,11 +28,17 @@ public class DeleteEpisodeActionTest {
 		qClient = mock(QbitorrentClient.class);
 		when(qClient.getFiles(eq("watched"))).thenReturn(List.of("watched.mkv"));
 		when(qClient.getFiles(eq("unwatched"))).thenReturn(List.of("unwatched.mkv"));
+
+		configStore = mock(ConfigStore.class);
+		when(configStore.getEpisodeDeleteCategories()).thenReturn(List.of("Álommeló"));
+		when(configStore.getEpisodeDeleteExtensions()).thenReturn(List.of("mkv"));
+		when(configStore.getEpisodeDeleteFolderEmby()).thenReturn("");
+		when(configStore.getEpisodeDeleteFolderTorrent()).thenReturn("");
 	}
 
 	@Test
 	public void testWatched() {
-		DeleteEpisodeAction action = new DeleteEpisodeAction(qClient, embyClient);
+		DeleteEpisodeAction action = new DeleteEpisodeAction(qClient, embyClient,configStore);
 		TorrentComposite t = mock(TorrentComposite.class);
 		when(t.getCategory()).thenReturn("Álommeló");
 		when(t.getId()).thenReturn("watched");
@@ -41,7 +49,7 @@ public class DeleteEpisodeActionTest {
 
 	@Test
 	public void testUnWatched() {
-		DeleteEpisodeAction action = new DeleteEpisodeAction(qClient, embyClient);
+		DeleteEpisodeAction action = new DeleteEpisodeAction(qClient, embyClient,configStore);
 		TorrentComposite t = mock(TorrentComposite.class);
 		when(t.getCategory()).thenReturn("Álommeló");
 		when(t.getId()).thenReturn("unwatched");

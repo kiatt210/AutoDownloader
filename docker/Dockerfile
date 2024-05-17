@@ -1,9 +1,10 @@
 FROM eclipse-temurin:19.0.2_7-jdk
+ARG VERSION
+ARG JAR_FILE
+ENV VERSION=$VERSION
 ENV TZ="Europe/Budapest"
 ENV API_KEY="<EMBY_API_KEY>"
 ENV USER_ID="<EMBY_USER_ID>"
-
-ARG JAR_FILE
 
 RUN mkdir -p /home/seeder/torrents/
 WORKDIR /home/seeder/

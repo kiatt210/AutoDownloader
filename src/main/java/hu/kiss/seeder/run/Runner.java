@@ -14,6 +14,7 @@ import hu.kiss.seeder.client.QbitorrentClient;
 import hu.kiss.seeder.client.TorrentClientI;
 import hu.kiss.seeder.client.mqtt.PahoClient;
 import hu.kiss.seeder.client.utils.HTTPUtils;
+import hu.kiss.seeder.config.ConfigStore;
 import hu.kiss.seeder.data.BitTorrent;
 import hu.kiss.seeder.data.Torrent;
 import hu.kiss.seeder.data.TorrentComposite;
@@ -42,8 +43,8 @@ public class Runner {
     private QbitorrentClient bitTorrentClient;
     private PahoClient pahoClient;
     private EmbyClient embyClient;
+    private ConfigStore configStore;
 
-    private PahoClient client;
     private List<Action> actions;
 
     private static Logger logger = LogManager.getLogger();
@@ -74,8 +75,9 @@ public class Runner {
      */
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
+	
         logger.info("-----------------------------------------------");
-        logger.info("Start runner v21");
+        logger.info("Start runner v"+System.getenv("VERSION"));
         logger.info("-----------------------------------------------");
         new Runner().run();
         logger.info("-----------------------------------------------");
@@ -111,9 +113,11 @@ public class Runner {
     }
 
     private void init() throws IOException, InterruptedException {
-	System.out.println(Secret.all("/home/seeder/secrets.json").get(0));
+
+	HTTPUtils httpUtils = new HTTPUtils();
 	pahoClient = new PahoClient();
-	embyClient = new EmbyClient(new HTTPUtils());
+	embyClient = new EmbyClient(httpUtils);
+	configStore = new ConfigStore(httpUtils);
         sendMqttStart();
 	
 	ncClientKiatt = new NCoreClient();
@@ -177,7 +181,7 @@ public class Runner {
 
     private void initActions(){
         actions = new ArrayList<Action>();
-	actions.add(new DeleteEpisodeAction(bitTorrentClient, embyClient));
+	actions.add(new DeleteEpisodeAction(bitTorrentClient, embyClient,configStore));
         actions.add(new StopPauseAction(bitTorrentClient));
         actions.add(new RSSDownloadAddTagAction(bitTorrentClient));
         actions.add(new WarnedAction(bitTorrentClient));

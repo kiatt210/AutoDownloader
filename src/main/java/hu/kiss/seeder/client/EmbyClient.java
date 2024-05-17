@@ -5,17 +5,15 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gson.JsonObject;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.json.simple.JSONArray;
 
 import hu.kiss.seeder.client.utils.HTTPUtils;
 
@@ -26,7 +24,7 @@ public class EmbyClient {
 	private HTTPUtils httpUtils;
 
 	public EmbyClient(HTTPUtils httpUtils) {
-	    this.httpUtils = httpUtils;
+	    this.httpUtils = httpUtils;	    
 	}
 
 	@SuppressWarnings("unchecked")
@@ -44,6 +42,8 @@ public class EmbyClient {
 
 		HttpResponse response = httpUtils.doGet(builder.build().toString(), headers);
 		logger.debug("Response code:"+response.getStatusLine().getStatusCode());
+		if (response.getStatusLine().getStatusCode() != 200)
+			return false;
 		var responseStr = EntityUtils.toString(response.getEntity());
 		logger.debug("Response str: " + responseStr);
 		JSONParser parser = new JSONParser();

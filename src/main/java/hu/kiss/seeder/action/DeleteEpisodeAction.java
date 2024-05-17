@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import hu.kiss.seeder.client.EmbyClient;
 import hu.kiss.seeder.client.QbitorrentClient;
+import hu.kiss.seeder.config.ConfigStore;
 import hu.kiss.seeder.data.TorrentComposite;
 
 public class DeleteEpisodeAction extends BaseAction {
@@ -14,26 +15,26 @@ public class DeleteEpisodeAction extends BaseAction {
 	private static Logger logger = LogManager.getLogger();
 	private QbitorrentClient qClient;
 	private EmbyClient embyClient;
+	private ConfigStore configStore;
 	private final String TAG = "tartós";
-	private static final List<String> VIDEO_EXTENSIONS = List.of("mkv", "mp4", "avi", "wmv");
-	private static final List<String> CATEGORIES = List.of("Álommeló","Capak kozott");
 
-	public DeleteEpisodeAction(QbitorrentClient qClient, EmbyClient embyClient) {
+	public DeleteEpisodeAction(QbitorrentClient qClient, EmbyClient embyClient, ConfigStore configStore) {
 		super(qClient);
 		this.qClient = qClient;
 		this.embyClient = embyClient;
+		this.configStore = configStore;
 	}
 
 	@Override
 	public void execute(TorrentComposite torrent) {
 		logger.debug("Start handle: nev - " + torrent.getNev() + " status - " + torrent.getBitStatus() + " id - "+ torrent.getId());
-		if (CATEGORIES.contains(torrent.getCategory()) && torrent.getTags().contains(TAG)) {
+		if (configStore.getEpisodeDeleteCategories().contains(torrent.getCategory()) && torrent.getTags().contains(TAG)) {
 			Boolean allWatched = true;
 			for (String episode : qClient.getFiles(torrent.getId())) {
 
 				var extension = episode.split("\\.")[episode.split("\\.").length-1];
-;
-				if (VIDEO_EXTENSIONS.contains(extension) && !episode.endsWith("sample."+extension) && !embyClient.isWatched(episode.replace("downloads", "mnt/share1"))) {
+
+				if (configStore.getEpisodeDeleteExtensions().contains(extension) && !episode.endsWith("sample."+extension) && !embyClient.isWatched(episode.replace(configStore.getEpisodeDeleteFolderTorrent(), configStore.getEpisodeDeleteFolderEmby()))) {
 					allWatched = false;
 				}
 			}
