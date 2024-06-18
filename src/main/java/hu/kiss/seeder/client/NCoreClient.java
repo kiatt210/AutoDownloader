@@ -141,7 +141,8 @@ public class NCoreClient {
 
     private void setTorrentName(List<Torrent> hrTorrents) {
 
-        try(var executor = Executors.newVirtualThreadPerTaskExecutor()){
+        var executor = Executors.newFixedThreadPool(10);
+        try(Closeable c = executor::shutdown){
 
             hrTorrents
                     .parallelStream()
@@ -176,7 +177,9 @@ public class NCoreClient {
 
             executor.shutdown();
 
-        }
+        } catch (IOException e) {
+		logger.error("Torrent download error:", e);
+	}
 
     }
 

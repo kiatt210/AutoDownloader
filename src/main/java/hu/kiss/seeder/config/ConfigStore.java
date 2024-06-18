@@ -18,7 +18,7 @@ import hu.kiss.seeder.client.utils.HTTPUtils;
 public class ConfigStore {
 
     private static Logger logger = LogManager.getLogger();
-    private static final String CONFIG_URL="http://config-store:8888/auto-downloader/default/auto-downloader.yml";
+    private static final String CONFIG_URL="http://config-server:8888/auto-downloader/default/auto-downloader.yml";
     private HTTPUtils httpUtils;
     private List<String> episodeDeleteCategories;
     private List<String> episodeDeleteExtensions;

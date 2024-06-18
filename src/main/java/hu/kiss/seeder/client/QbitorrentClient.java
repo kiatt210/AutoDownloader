@@ -152,7 +152,8 @@ public class QbitorrentClient implements TorrentClientI {
 
 	@Override
 	public List<BitTorrent> getSeededTorrents() {
-		return seededTorrents;
+		
+		return seededTorrents != null ? seededTorrents : List.of();
 	}
 
 	@Override
@@ -211,6 +212,8 @@ public class QbitorrentClient implements TorrentClientI {
 
 	@Override
 	public int getCountByCategory(String category) {
+		if (this.seededTorrents == null)
+			return 0;
 		long count = this.seededTorrents.stream().filter(t -> t.getCategory().equals(category)).count();
 
 		return Long.valueOf(count).intValue();

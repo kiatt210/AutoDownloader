@@ -21,6 +21,7 @@ import hu.kiss.seeder.data.TorrentComposite;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -98,7 +99,7 @@ public class Runner {
             return;
         }
 
-        logger.info("Seeded torrent size: " + bitTorrentClient.getSeededTorrents().size());
+        logger.info("Seeded torrent size: " + (bitTorrentClient.getSeededTorrents() != null ? bitTorrentClient.getSeededTorrents().size(): 0));
         logger.info("Running torrent size: " + bitTorrentClient.getRunningSize());
 
         callActions();
@@ -127,7 +128,9 @@ public class Runner {
         ncClientDake.login(Secret.all("/home/seeder/secrets.json").get(1));
 
 	bitTorrentClient = new QbitorrentClient();
-        try(var executor = Executors.newVirtualThreadPerTaskExecutor()){
+
+	var executor = Executors.newFixedThreadPool(10);
+        try(Closeable c = executor::shutdown){
             executor.execute(()-> {
                         //Ki gyűjtkük az ncore-ban lévő torrenteket
                         ncClientKiatt.populateHrTorrents();
@@ -149,7 +152,8 @@ public class Runner {
     private void populateTorrentComposites(){
         torrents = Collections.synchronizedList(new ArrayList<>());
         //Populate from ncore Hit&Run
-        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+        var executor = Executors.newFixedThreadPool(10);
+        try(Closeable c = executor::shutdown){
 
             ncClientKiatt.getHrTorrents().stream().forEach(t -> {
                 executor.submit(() -> {
@@ -164,8 +168,14 @@ public class Runner {
             });
 
         }
+	catch (IOException e) {
+	    logger.error("Error in torrent populate:", e);
+	}
+	
 
         //Append the rest from bittorrent
+	if (bitTorrentClient.getSeededTorrents() == null)
+		return;
         bitTorrentClient.getSeededTorrents().stream()
                 .filter(bt ->
                         torrents.stream()
